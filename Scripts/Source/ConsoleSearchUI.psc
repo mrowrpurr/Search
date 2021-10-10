@@ -1,0 +1,2 @@
+scriptName ConsoleSearchUI extends ReferenceAlias  
+
