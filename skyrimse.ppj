@@ -20,12 +20,12 @@
     <Imports>
         <!-- Core Dependencies -->
         <Import>@ImportsFolder\SKSE64\Scripts\Source</Import>
-        <Import>@ImportsFolder\ConsoleUtil\Scripts\Source</Import>
+        <Import>@ModsFolder\FormHelper\Scripts\Source</Import>
+        <Import>@ImportsFolder\JContainers\Scripts\Source</Import>
 
         <!-- UI Dependencies -->
-        <Import>@ImportsFolder\JContainers\Scripts\Source</Import>
         <Import>@ImportsFolder\UIExtensions\Scripts\Source</Import>
-        <Import>C:\Program Files (x86)\Steam\steamapps\common\Skyrim Special Edition\Data\Scripts\Source</Import>
+        <Import>C:\Steam\steamapps\common\Skyrim Special Edition\Data\Scripts\Source</Import>
     </Imports>
     <Folders>
         <!-- Relative path to folder containing .psc Papyrus source code files for this project -->
