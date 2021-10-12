@@ -57,3 +57,49 @@ string function Help(string query) global
     __consoleSearch.ToggleConsole()
     return text
 endFunction
+
+string[] function GetResultCategories(int allResultsReference) global
+    return JMap.allKeysPArray(allResultsReference)
+endFunction
+
+string function GetResultCategoryCount(int allResultsReference, string category) global
+    int categoryArray = JMap.getObj(allResultsReference, category)
+    if categoryArray
+        return JArray.count(categoryArray)
+    else
+        return 0
+    endIf
+endFunction
+
+int function GetNthResultReference(int allResultsReference, string category, int index) global
+    int categoryArray = JMap.getObj(allResultsReference, category)
+    if categoryArray
+        return JArray.getObj(categoryArray, index)
+    else
+        return 0
+    endIf
+endFunction
+
+string function GetIndividualResultName(int individualResultReference) global
+    return JMap.getStr(individualResultReference, "name")
+endFunction
+
+string function GetIndividualResultEditorID(int individualResultReference) global
+    return JMap.getStr(individualResultReference, "editorID")
+endFunction
+
+string function GetIndividualResultFormID(int individualResultReference) global
+    return JMap.getStr(individualResultReference, "formID")
+endFunction
+
+function SaveResult(int result) global
+    JValue.retain(result)
+endFunction
+
+function DeleteResult(int result) global
+    JValue.release(result)
+endFunction
+
+function SaveResultToFile(int result, string filepath) global
+    JValue.writeToFile(result, filepath)
+endFunction
