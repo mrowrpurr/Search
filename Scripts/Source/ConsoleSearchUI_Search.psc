@@ -30,6 +30,8 @@ function Show()
 
     int count = ConsoleSearch.GetResultCategoryCount(allResults, category)
 
+    Actor player = Game.GetPlayer()
+
     Debug.MessageBox("Category " + category + " has " + count + " results")
 
     i = 0
@@ -39,6 +41,14 @@ function Show()
         string editorId = ConsoleSearch.GetResultEditorID(result)
         string formId = ConsoleSearch.GetResultFormID(result)
         Form theForm = FormHelper.HexToForm(formId)
+        Spell theSpell = theForm as Spell
+        if theSpell
+            player.AddSpell(theSpell)
+        endIf
+        ActorBase theActorBase = theForm as ActorBase
+        if theActorBase
+            player.PlaceAtMe(theActorBase)
+        endIf
         text += name + " " + formId + " " + theForm + " " + theForm.GetName() + "\n"
         i += 1
     endWhile
