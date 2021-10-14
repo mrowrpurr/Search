@@ -105,7 +105,7 @@ endFunction
 
 ; Gets the count of all results discovered in the specified category.
 ; Provide the "`allResultsReference`" which is returned by the `Search()` function.
-string function GetResultCategoryCount(int allResultsReference, string category) global
+int function GetResultCategoryCount(int allResultsReference, string category) global
     int categoryArray = JMap.getObj(allResultsReference, category)
     if categoryArray
         return JArray.count(categoryArray)

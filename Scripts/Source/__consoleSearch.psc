@@ -22,6 +22,7 @@ endFunction
 
 function RunCommand(string command) global
     UI.SetString("Console", "_global.Console.ConsoleInstance.CommandEntry.text", command)
+    Utility.WaitMenuMode(0.1) ; TODO XXX FIXME
     Input.TapKey(28) ; Enter
     while ReadConsoleText() == "" || ReadConsoleText() == command ; Nothing printed out except the command
         Utility.WaitMenuMode(0.1)
