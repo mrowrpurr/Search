@@ -6,7 +6,7 @@ bool function IsConsoleOpen() global
 endFunction
 
 function ToggleConsole() global
-    Input.TapKey(Input.GetMappedKey("Console"))
+    ; Input.TapKey(Input.GetMappedKey("Console"))
 endFunction
 
 function ClearConsoleText() global
@@ -21,9 +21,12 @@ string function ReadConsoleText() global
 endFunction
 
 function RunCommand(string command) global
-    UI.SetString("Console", "_global.Console.ConsoleInstance.CommandEntry.text", command)
-    Utility.WaitMenuMode(0.1) ; TODO XXX FIXME
-    Input.TapKey(28) ; Enter
+    ; UI.SetString("Console", "_global.Console.ConsoleInstance.CommandEntry.text", command)
+    ; Utility.WaitMenuMode(0.1) ; TODO XXX FIXME
+    ; Input.TapKey(28) ; Enter
+
+    ConsoleUtil.ExecuteCommand(command)
+
     while ReadConsoleText() == "" || ReadConsoleText() == command ; Nothing printed out except the command
         Utility.WaitMenuMode(0.1)
     endWhile

@@ -4,12 +4,12 @@ scriptName ConsoleSearch
 ; Returns the raw returned text from running `help "[query]"` in the console
 string function Help(string query) global
     if ! __consoleSearch.IsConsoleOpen()
-        __consoleSearch.ToggleConsole()
+        ; __consoleSearch.ToggleConsole()
     endIf
     __consoleSearch.ClearConsoleText()
     __consoleSearch.RunCommand("help \"" + query + "\"")
     string text = __consoleSearch.ReadConsoleText()
-    __consoleSearch.ToggleConsole()
+    ; __consoleSearch.ToggleConsole()
     return text
 endFunction
 

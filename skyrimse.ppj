@@ -22,6 +22,7 @@
         <Import>@ImportsFolder\SKSE64\Scripts\Source</Import>
         <Import>@ModsFolder\FormHelper\Scripts\Source</Import>
         <Import>@ImportsFolder\JContainers\Scripts\Source</Import>
+        <Import>@ImportsFolder\ConsoleUtil\Scripts\Source</Import>
 
         <!-- UI Dependencies -->
         <Import>@ImportsFolder\UIExtensions\Scripts\Source</Import>
