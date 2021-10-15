@@ -299,6 +299,13 @@ function ShowCategory(int searchResults, string category)
     elseIf category == "FURN"
         ShowCategory_Furniture(searchResults)
 
+    elseIf category == "QUST"
+        ShowCategory_Quest(searchResults)
+
+    elseIf category == "LCRT"
+        Debug.MessageBox("Markers aren't yet really useful, we'll make it so you can move them, move TO them, and SEE them by changing the .ini settings")
+        ShowCategory_Marker(searchResults)
+
     else
         Debug.MessageBox("Category not yet supported: " + category)
     endIf
@@ -310,6 +317,48 @@ function ShowCategory_Cell(int searchResults)
         int result = Search.GetNthResultInCategory(searchResults, "CELL", selection)
         string editorId = Search.GetResultEditorID(result)
         Debug.CenterOnCell(editorId)
+    endIf
+endFunction
+
+function ShowCategory_Quest(int searchResults)
+    int selection = ShowSearchResultChooser(searchResults, "QUST", "~ Choose Quest ~", showName = true, showEditorId = true, showFormId = true)
+    if selection > -1
+        int result = Search.GetNthResultInCategory(searchResults, "QUST", selection)
+        string editorId = Search.GetResultEditorID(result)
+        string formId = Search.GetResultFormID(result)
+        Quest theQuest = FormHelper.HexToForm(formId) as Quest
+
+        int listOptions = JArray.object()
+        JArray.addStr(listOptions, "[" + editorId + "]")
+        JArray.addStr(listOptions, "Start Quest")
+        JArray.addStr(listOptions, "Stop Quest")
+        JArray.addStr(listOptions, "Reset Quest")
+        JArray.addStr(listOptions, "Set Stage")
+        JArray.addStr(listOptions, "Set Objective Displayed")
+        JArray.addStr(listOptions, "Set Objective Completed")
+        JArray.addStr(listOptions, "Set Objective Failed")
+
+        string questAction = GetUserSelection(JArray.asStringArray(listOptions))
+
+        if questAction == "Start Quest"
+            theQuest.Start()
+            Debug.MessageBox("Started quest " + theQuest)
+        elseIf questAction == "Stop Quest"
+            theQuest.Stop()
+        elseIf questAction == "Reset Quest"
+            theQuest.Reset()
+        elseIf questAction == "Set Stage"
+            ; theQuest.SetCurrentStageID(GetUserInput() as int)
+            int stage = GetUserInput() as int
+            theQuest.SetCurrentStageID(stage)
+            Debug.MessageBox("Set quest stage to: " + stage)
+        elseIf questAction == "Set Objective Displayed"
+            theQuest.SetObjectiveDisplayed(GetUserInput() as int)
+        elseIf questAction == "Set Objective Completed"
+            theQuest.SetObjectiveCompleted(GetUserInput() as int)
+        elseIf questAction == "Set Objective Failed"
+            theQuest.SetObjectiveFailed(GetUserInput() as int)
+        endIf
     endIf
 endFunction
 
@@ -335,11 +384,29 @@ function ShowCategory_Furniture(int searchResults)
     if selection > -1
         int result = Search.GetNthResultInCategory(searchResults, "FURN", selection)
         string formId = Search.GetResultFormID(result)
-        Debug.MessageBox("Try casting the fork spell!")
+        Debug.MessageBox("Cast spell to place furniture")
         PlayerRef.AddSpell(Search_Placement_Spell)
         PlayerRef.EquipSpell(Search_Placement_Spell, 0)
         PlayerRef.EquipSpell(Search_Placement_Spell, 1)
         ObjectToPlace = FormHelper.HexToForm(formId)
+    endIf
+endFunction
+
+function ShowCategory_Marker(int searchResults)
+    int selection = ShowSearchResultChooser(searchResults, "LCRT", "~ Choose Marker ~", showName = false, showEditorId = true, showFormId = true)
+    if selection > -1
+        int result = Search.GetNthResultInCategory(searchResults, "LCRT", selection)
+        string formId = Search.GetResultFormID(result)
+        Debug.MessageBox(formId)
+        Form theMarker = FormHelper.HexToForm(formId)
+        Debug.MessageBox(theMarker)
+        ObjectReference markerInstance = theMarker as ObjectReference
+        Debug.MessageBox(markerInstance)
+        ; Debug.MessageBox("Try casting the fork spell!")
+        ; PlayerRef.AddSpell(Search_Placement_Spell)
+        ; PlayerRef.EquipSpell(Search_Placement_Spell, 0)
+        ; PlayerRef.EquipSpell(Search_Placement_Spell, 1)
+        ; ObjectToPlace = FormHelper.HexToForm(formId)
     endIf
 endFunction
 
