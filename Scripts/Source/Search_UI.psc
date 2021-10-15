@@ -21,7 +21,6 @@ event OnInit()
 endEvent
 
 function Setup()
-    PlayerRef = Game.GetPlayer()
     LoadConfiguration()
     ListenForKeyboardShortcuts()
 endFunction
@@ -297,6 +296,9 @@ function ShowCategory(int searchResults, string category)
     elseIf category == "ARMO"
         ShowCategory_Armor(searchResults)
 
+    elseIf category == "FURN"
+        ShowCategory_Furniture(searchResults)
+
     else
         Debug.MessageBox("Category not yet supported: " + category)
     endIf
@@ -312,12 +314,11 @@ function ShowCategory_Cell(int searchResults)
 endFunction
 
 function ShowCategory_Armor(int searchResults)
-
 endFunction
 
 function ShowCategory_Actors(int searchResults)
     int selection = ShowSearchResultChooser(searchResults, "NPC_", "~ Choose NPC to Spawn ~", showName = true, showEditorId = false, showFormId = true)
-    if selection >= 0
+    if selection > -1
         int result = Search.GetNthResultInCategory(searchResults, "NPC_", selection)
         int count = GetUserInput(1) as int
         if ! count
@@ -326,6 +327,18 @@ function ShowCategory_Actors(int searchResults)
         string formId = Search.GetResultFormID(result)
         Form theForm = FormHelper.HexToForm(formId)
         PlayerRef.PlaceAtMe(theForm, count)
+    endIf
+endFunction
+
+function ShowCategory_Furniture(int searchResults)
+    int selection = ShowSearchResultChooser(searchResults, "FURN", "~ Choose Furniture to Place ~", showName = true, showEditorId = true, showFormId = true)
+    if selection > -1
+        int result = Search.GetNthResultInCategory(searchResults, "FURN", selection)
+        string formId = Search.GetResultFormID(result)
+        Debug.MessageBox("Try casting the fork spell!")
+        PlayerRef.AddSpell(Search_Placement_Spell)
+        PlayerRef.EquipSpell(Search_Placement_Spell, 0)
+        PlayerRef.EquipSpell(Search_Placement_Spell, 1)
     endIf
 endFunction
 
@@ -400,7 +413,7 @@ int function ShowSearchResultChooser(int searchResults, string category, string 
         if showFormId
             text += prefix + "(" + formId + ")"
         endIf
-        if ! filter || StringUtil.Find(name + editorId, filter) > -1
+        if ! filter || StringUtil.Find(name + editorId + formId, filter) > -1
             JArray.addStr(optionsToShow, text)
             listMenu.AddEntryItem(text)
             JIntMap.setInt(selectionIndexToNthIndex, itemIndex, i)
@@ -488,3 +501,9 @@ string function GetUserSelection(string[] options, bool showFilter = true, strin
         endIf
     endIf
 endFunction
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Object Placement Spell
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+Spell property Search_Placement_Spell auto
