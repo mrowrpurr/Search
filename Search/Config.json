@@ -3,7 +3,15 @@
         "ui": {
             "key": 31,
             "shift": "true",
-            "ctrl": "true"
+            "alt": "true"
         }
+    },
+    "category_names": {
+        "dial": "Dialogue",
+        "fact": "Faction",
+        "npc_": "Actor",
+        "keym": "Key",
+        "lctn": "Location",
+        "qust": "Quest"
     }
 }

@@ -15,6 +15,7 @@ For the Papyrus Utility, see the `Search.psc` script.}
 
 event OnInit()
     CurrentlyInstalledVersion = GetCurrentVersion()
+    Setup()
 endEvent
 
 function Setup()
@@ -36,9 +37,10 @@ endFunction
 ; Configuration
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-string property ConfigPath_Root              = ".search.config" autoReadonly
+string property ConfigPath_Root              = ".search.config"                    autoReadonly
 string property ConfigPath_KeyboardShortcuts = ".search.config.keyboard_shortcuts" autoReadonly
-string property ConfigurationFilePath        = "Search/Config.json" autoReadonly
+string property ConfigPath_Category_Names    = ".search.config.category_names"     autoReadonly
+string property ConfigurationFilePath        = "Data/Search/Config.json"                autoReadonly
 
 function LoadConfiguration()
     int configFromFile = JValue.readFromFile(ConfigurationFilePath)
@@ -46,6 +48,7 @@ function LoadConfiguration()
         JDB.solveObjSetter(ConfigPath_Root, configFromFile, createMissingKeys = true)
     else
         JDB.solveObjSetter(ConfigPath_KeyboardShortcuts, JMap.object(), createMissingKeys = true)
+        JDB.solveObjSetter(ConfigPath_Category_Names,    JMap.object(), createMissingKeys = true)
     endIf
 endFunction
 
@@ -136,6 +139,49 @@ string function GetTriggeredKeyboardShortcutName(int keyCode, bool ctrlPressed, 
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Category Name Replacement
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+int property CategoryNameMap
+    int function get()
+        return JDB.solveObj(ConfigPath_Category_Names)
+    endFunction
+endProperty
+
+string function GetCategoryDisplayName(string name)
+    string friendlyName = JMap.getStr(CategoryNameMap, name)
+    if friendlyName
+        return friendlyName
+    else
+        return name
+    endIf
+endFunction
+
+string function GetRealCategoryNameFromDisplayName(string displayName)
+    string[] categoryNames = JMap.allKeysPArray(CategoryNameMap)
+    int i = 0
+    while i < categoryNames.Length
+        string categoryName = categoryNames[i]
+        string friendlyName = JMap.getStr(CategoryNameMap, categoryName)
+        if friendlyName == displayName
+            return categoryName
+        endIf
+        i += 1
+    endWhile
+    return displayName
+endFunction
+
+string[] function GetCategoryDisplayNames(string[] categories)
+    string[] displayNames = Utility.CreateStringArray(categories.Length)
+    int i = 0
+    while i < categories.Length
+        displayNames[i] = GetCategoryDisplayName(categories[i])
+        i += 1
+    endWhile
+    return displayNames
+endFunction
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Open Main Search UI prompt
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -183,7 +229,7 @@ function ShowSearchCategorySelection(string query, int searchResults)
         Debug.MessageBox("No results found for '" + query + "'")
         return
     endIf
-    string category = GetUserSelection(categoryNames)
+    string category = GetUserSelection(GetCategoryDisplayNames(categoryNames))
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
