@@ -270,6 +270,7 @@ function ShowSearchCategorySelection(string query, int searchResults)
     JArray.addFromArray(options, categoriesWithCounts)
 
     string categoryNameWithCount = GetUserSelection(JArray.asStringArray(options), showFilter = false)
+    Debug.MessageBox(categoryNameWithCount)
 
     if categoryNameWithCount
         int categoryIndex = JArray.findStr(categoriesWithCounts, categoryNameWithCount)
@@ -298,6 +299,9 @@ function ShowCategory(int searchResults, string category)
 
     elseIf category == "FURN"
         ShowCategory_Furniture(searchResults)
+
+    elseIf category == "MARK"
+        ShowCategory_Marker(searchResults)
 
     else
         Debug.MessageBox("Category not yet supported: " + category)
@@ -335,11 +339,24 @@ function ShowCategory_Furniture(int searchResults)
     if selection > -1
         int result = Search.GetNthResultInCategory(searchResults, "FURN", selection)
         string formId = Search.GetResultFormID(result)
-        Debug.MessageBox("Try casting the fork spell!")
-        PlayerRef.AddSpell(Search_Placement_Spell)
         PlayerRef.EquipSpell(Search_Placement_Spell, 0)
         PlayerRef.EquipSpell(Search_Placement_Spell, 1)
         ObjectToPlace = FormHelper.HexToForm(formId)
+    endIf
+endFunction
+
+function ShowCategory_Marker(int searchResults)
+    int selection = ShowSearchResultChooser(searchResults, "MARK", "~ Choose Marker ~", showName = true, showEditorId = true, showFormId = true)
+    if selection > -1
+        int result = Search.GetNthResultInCategory(searchResults, "MARK", selection)
+        string formId = Search.GetResultFormID(result)
+        Form theMarker = FormHelper.HexToForm(formId)
+        Debug.MessageBox(theMarker)
+        ObjectReference markerInstance = theMarker as ObjectReference
+        Debug.MessageBox(markerInstance)
+        if markerInstance
+            PlayerRef.MoveTo(markerInstance)
+        endIf
     endIf
 endFunction
 
