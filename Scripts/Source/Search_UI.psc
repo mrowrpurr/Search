@@ -296,6 +296,9 @@ function ShowCategory(int searchResults, string category)
     elseIf category == "ARMO"
         ShowCategory_Armor(searchResults)
 
+    elseIf category == "WEAP"
+        ShowCategory_Weapon(searchResults)
+
     elseIf category == "FURN"
         ShowCategory_Furniture(searchResults)
 
@@ -342,16 +345,12 @@ function ShowCategory_Quest(int searchResults)
 
         if questAction == "Start Quest"
             theQuest.Start()
-            Debug.MessageBox("Started quest " + theQuest)
         elseIf questAction == "Stop Quest"
             theQuest.Stop()
         elseIf questAction == "Reset Quest"
             theQuest.Reset()
         elseIf questAction == "Set Stage"
-            ; theQuest.SetCurrentStageID(GetUserInput() as int)
-            int stage = GetUserInput() as int
-            theQuest.SetCurrentStageID(stage)
-            Debug.MessageBox("Set quest stage to: " + stage)
+            theQuest.SetCurrentStageID(GetUserInput() as int)
         elseIf questAction == "Set Objective Displayed"
             theQuest.SetObjectiveDisplayed(GetUserInput() as int)
         elseIf questAction == "Set Objective Completed"
@@ -363,6 +362,71 @@ function ShowCategory_Quest(int searchResults)
 endFunction
 
 function ShowCategory_Armor(int searchResults)
+    int selection = ShowSearchResultChooser(searchResults, "ARMO", "~ View Armor ~", showName = true, showEditorId = true, showFormId = true, option1 = "[View All Items]")
+    if selection > -1
+        int result = Search.GetNthResultInCategory(searchResults, "ARMO", selection)
+        string editorId = Search.GetResultEditorID(result)
+        string formId = Search.GetResultFormID(result)
+        Armor theArmor = FormHelper.HexToForm(formId) as Armor
+
+        int listOptions = JArray.object()
+        JArray.addStr(listOptions, "[" + theArmor.GetName() + "]")
+        JArray.addStr(listOptions, "Edit Armor Rating")
+        JArray.addStr(listOptions, "Edit Armor Type")
+        JArray.addStr(listOptions, "Set Enchantment")
+        if theArmor.GetEnchantment()
+            JArray.addStr(listOptions, "Set Enchantment Magnitude")
+        endIf
+        JArray.addStr(listOptions, "Set Slot Mask")
+
+        string armorAction = GetUserSelection(JArray.asStringArray(listOptions))
+
+        if armorAction == "Edit Armor Rating"
+            int armorRating = GetUserInput(theArmor.GetArmorRating()) as int
+            theArmor.SetArmorRating(armorRating)
+            Debug.MessageBox("Set the armor rating of " + theArmor.GetName() + "  to " + armorRating)
+        elseIf armorAction == "Edit Armor Type"
+
+        elseIf armorAction == "Set Enchantment"
+            Enchantment theEnchantmentOnArmor
+            while ! theEnchantmentOnArmor
+                int enchantmentResult = ChooseEnchantment()
+                string enchantmentFormId = Search.GetResultFormID(enchantmentResult)
+                Enchantment theEnchantment = FormHelper.HexToForm(enchantmentFormId) as Enchantment
+                if theEnchantment
+                    theArmor.SetEnchantment(theEnchantment)
+                    theEnchantmentOnArmor = theArmor.GetEnchantment()
+                    if theEnchantmentOnArmor
+                        Debug.MessageBox("Applied enchantment " + theEnchantment.GetName() + " to " + theArmor.GetName())
+                    endIf
+                endIf
+            endWhile
+
+        elseIf armorAction == "Set Magnitude"
+
+        elseIf armorAction == "Set Slot Mask"
+
+        endIf
+
+    elseIf selection == -2
+        ; View All Items
+        ItemAndSpellStorage.RemoveAllItems()
+        int count = Search.GetResultCategoryCount(searchResults, "ARMO")
+        int i = 0
+        while i < count
+            int item = Search.GetNthResultInCategory(searchResults, "ARMO", i)
+            string formId = Search.GetResultFormID(item)
+            Form theForm = FormHelper.HexToForm(formId)
+            ItemAndSpellStorage.AddItem(theForm)
+            i += 1
+        endWhile
+        ItemAndSpellStorage.GetActorBase().SetName("Items")
+        ItemAndSpellStorage.OpenInventory(abForceOpen = true)
+    endIf
+endFunction
+
+function ShowCategory_Weapon(int searchResults)
+    
 endFunction
 
 function ShowCategory_Actors(int searchResults)
@@ -411,20 +475,19 @@ function ShowCategory_Marker(int searchResults)
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Get Names of Items in Categories
+; Custom Choosers
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Click on header: 0
-; Click on option 1:  -1
-; Click on option 2:  -2
-; Click on option 3:  -3
+; Click on header:    -1
+; Click on option 1:  -2
+; Click on option 2:  -3
+; Click on option 3:  -4
 int function ShowSearchResultChooser(int searchResults, string category, string header = "", bool showFilter = true, string filter = "", string option1 = "", string option2 = "", string option3 = "", bool showName = true, bool showFormId = true, bool showEditorId = false)
     int optionsToShow = JArray.object()
 
     UIListMenu listMenu = UIExtensions.GetMenu("UIListMenu") as UIListMenu
 
     int currentIndex = 0
-
     int headerIndex  = -1
     int option1Index = -1
     int option2Index = -1
@@ -438,17 +501,17 @@ int function ShowSearchResultChooser(int searchResults, string category, string 
     endIf
     if option1
         listMenu.AddEntryItem(option1)
-        option1 = currentIndex
+        option1Index = currentIndex
         currentIndex += 1
     endIf
     if option2
         listMenu.AddEntryItem(option2)
-        option2 = currentIndex
+        option2Index = currentIndex
         currentIndex += 1
     endIf
     if option3
         listMenu.AddEntryItem(option3)
-        option3 = currentIndex
+        option3Index = currentIndex
         currentIndex += 1
     endIf
     if showFilter && ! filter
@@ -522,6 +585,18 @@ int function ShowSearchResultChooser(int searchResults, string category, string 
     endIf
 endFunction
 
+int function ChooseEnchantment()
+    string enchantmentQuery = GetUserInput()
+    if enchantmentQuery
+        int enchantmentSearchResults = Search.ExecuteSearch(enchantmentQuery)
+        int enchantmentIndex = ShowSearchResultChooser(enchantmentSearchResults, "ENCH", "~ Choose Enchantment to Apply ~")
+        if enchantmentIndex > -1
+            int enchantmentResult = Search.GetNthResultInCategory(enchantmentSearchResults, "ENCH", enchantmentIndex)
+            return enchantmentResult
+        endIf
+    endIf
+endFunction
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; UI Extensions Helpers
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -575,5 +650,19 @@ endFunction
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Form property ObjectToPlace auto
-
 Spell property Search_Placement_Spell auto
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Item and Spell Storage
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+Actor property ItemAndSpellStorage auto
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Items
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Spells
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
