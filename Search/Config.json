@@ -1,0 +1,9 @@
+{
+    "keyboard_shortcuts": {
+        "ui": {
+            "key": 31,
+            "shift": "true",
+            "ctrl": "true"
+        }
+    }
+}

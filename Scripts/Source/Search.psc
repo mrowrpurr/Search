@@ -1,16 +1,88 @@
-scriptName ConsoleSearch
+scriptName Search
 {Get `help` results from the console}
 
 ; Returns the raw returned text from running `help "[query]"` in the console
 string function Help(string query) global
-    if ! __consoleSearch.IsConsoleOpen()
-        ; __consoleSearch.ToggleConsole()
+
+    bool consoleOpen = UI.GetBool("Console", "_global.Console.ConsoleInstance.Shown")
+
+    ; Is ConsoleUtil installed?
+    bool consoleUtilInstalled = ConsoleUtil.GetVersion()
+
+    ; Is it initialized? Check.
+    float consoleInitialized = UI.GetFloat("Console", "_global.Console.ConsoleInstance._SearchInitialized")
+
+    ; Initialize by opening the console at least once (then you can immediately close it)
+    if ! consoleInitialized
+        if ! consoleOpen
+            Input.TapKey(Input.GetMappedKey("Console")) ; Open
+            ; Wait for it to be Shown
+            while ! UI.GetBool("Console", "_global.Console.ConsoleInstance.Shown")
+                Utility.WaitMenuMode(0.01)
+            endWhile
+            consoleOpen = true
+        endIf
+
+        UI.SetFloat("Console", "_global.Console.ConsoleInstance._SearchInitialized", 69) ; Set as initialized
+        
+        if consoleOpen && consoleUtilInstalled
+            Input.TapKey(Input.GetMappedKey("Console")) ; Close (but keep it open if console util not installed)
+        endIf
     endIf
-    __consoleSearch.ClearConsoleText()
-    __consoleSearch.RunCommand("help \"" + query + "\"")
-    string text = __consoleSearch.ReadConsoleText()
-    ; __consoleSearch.ToggleConsole()
-    return text
+
+    ; Clear the console
+    UI.SetString("Console", "_global.Console.ConsoleInstance.CommandHistory.text", "")
+
+    ; Console command
+    string command = "help \"" + query + "\""
+
+    ; Run the command
+    if consoleUtilInstalled ; Use ConsoleUtil if installed
+        ; Run the command (in the background)
+        ConsoleUtil.ExecuteCommand(command)
+
+        ; Wait on the output to not be blank (or have more than just the command we write)
+        while UI.GetString("Console", "_global.Console.ConsoleInstance.CommandHistory.text") == "" || UI.GetString("Console", "_global.Console.ConsoleInstance.CommandHistory.text") == command
+            Utility.WaitMenuMode(0.01)
+        endWhile
+    else
+        ; Open
+        if ! consoleOpen
+            Input.TapKey(Input.GetMappedKey("Console"))
+            consoleOpen = true
+        endIf
+
+        ; Wait for it to be Shown
+        while ! UI.GetBool("Console", "_global.Console.ConsoleInstance.Shown")
+            Utility.WaitMenuMode(0.01)
+        endWhile
+
+        ;  The command to run
+        UI.SetString("Console", "_global.Console.ConsoleInstance.CommandEntry.text", command)
+
+        while UI.GetString("Console", "_global.Console.ConsoleInstance.CommandEntry.text") != command
+            Utility.WaitMenuMode(0.01)
+        endWhile
+
+        ; Enter (Twice, just cuz)
+        Input.TapKey(28)
+        Input.TapKey(28)
+
+        ; Just cuz.
+        Utility.WaitMenuMode(0.01) 
+
+        ; Close
+        if consoleOpen
+            Input.TapKey(Input.GetMappedKey("Console"))
+        endIf
+
+        ; Wait on the output to not be blank (or have more than just the command we write)
+        while UI.GetString("Console", "_global.Console.ConsoleInstance.CommandHistory.text") == "" || UI.GetString("Console", "_global.Console.ConsoleInstance.CommandHistory.text") == command
+            Utility.WaitMenuMode(0.01)
+        endWhile
+    endIf
+
+    return UI.GetString("Console", "_global.Console.ConsoleInstance.CommandHistory.text")
 endFunction
 
 ; Search Skyrim
@@ -52,7 +124,7 @@ endFunction
 ; endWhile
 ;
 ; ```
-int function Search(string query, string category = "", string filter = "") global
+int function ExecuteSearch(string query, string category = "", string filter = "") global
     int results = JMap.object()
     string newline = StringUtil.AsChar(13) ; 10 is Line Feed, 13 is Carriage Return
     string text = Help(query)
