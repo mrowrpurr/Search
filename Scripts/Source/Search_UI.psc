@@ -397,12 +397,23 @@ function ShowCategory_Armor(int searchResults)
                     theArmor.SetEnchantment(theEnchantment)
                     theEnchantmentOnArmor = theArmor.GetEnchantment()
                     if theEnchantmentOnArmor
-                        Debug.MessageBox("Applied enchantment " + theEnchantment.GetName() + " to " + theArmor.GetName())
+                        if theEnchantmentOnArmor == theEnchantment
+                            Debug.MessageBox("Applied enchantment " + theEnchantment.GetName() + " to " + theArmor.GetName())
+                        else
+                            theEnchantmentOnArmor = None
+                        endIf
                     endIf
                 endIf
             endWhile
 
-        elseIf armorAction == "Set Magnitude"
+        elseIf armorAction == "Set Enchantment Magnitude"
+            Enchantment theEnchantment = theArmor.GetEnchantment()
+            int effectIndex = ChooseNthEnchantmentMagicEffect(theEnchantment)
+            float originalMagnitude = theEnchantment.GetNthEffectMagnitude(effectIndex)
+            float magnitude = GetUserInput(originalMagnitude) as float
+            theEnchantment.SetNthEffectMagnitude(effectIndex, magnitude) 
+            MagicEffect theEffect = theEnchantment.GetNthEffectMagicEffect(effectIndex)
+            Debug.MessageBox("Changed magnitude of " + theEffect.GetName() + " from " + originalMagnitude + " to " + magnitude)
 
         elseIf armorAction == "Set Slot Mask"
 
@@ -595,6 +606,20 @@ int function ChooseEnchantment()
             return enchantmentResult
         endIf
     endIf
+endFunction
+
+int function ChooseNthEnchantmentMagicEffect(Enchantment theEnchanment)
+    int options = JArray.object()
+    int count = theEnchanment.GetNumEffects()
+    int i = 0
+    while i < count
+        MagicEffect theEffect = theEnchanment.GetNthEffectMagicEffect(i)
+        JArray.addStr(options, theEffect.GetName())
+        i += 1
+    endWhile
+    string selection = GetUserSelection(JArray.asStringArray(options))
+    int selectionIndex = JArray.findStr(options, selection)
+    return selectionIndex
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
