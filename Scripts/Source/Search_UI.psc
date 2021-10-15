@@ -13,12 +13,15 @@ For the Papyrus Utility, see the `Search.psc` script.}
 ; Mod Installation and Setup
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+Actor property PlayerRef auto
+
 event OnInit()
     CurrentlyInstalledVersion = GetCurrentVersion()
     Setup()
 endEvent
 
 function Setup()
+    PlayerRef = Game.GetPlayer()
     LoadConfiguration()
     ListenForKeyboardShortcuts()
 endFunction
@@ -313,7 +316,17 @@ function ShowCategory_Armor(int searchResults)
 endFunction
 
 function ShowCategory_Actors(int searchResults)
-
+    int selection = ShowSearchResultChooser(searchResults, "NPC_", "~ Choose NPC to Spawn ~", showName = true, showEditorId = false, showFormId = true)
+    if selection >= 0
+        int result = Search.GetNthResultInCategory(searchResults, "NPC_", selection)
+        int count = GetUserInput(1) as int
+        if ! count
+            count = 1
+        endIf
+        string formId = Search.GetResultFormID(result)
+        Form theForm = FormHelper.HexToForm(formId)
+        PlayerRef.PlaceAtMe(theForm, count)
+    endIf
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
