@@ -339,6 +339,7 @@ function ShowCategory_Furniture(int searchResults)
         PlayerRef.AddSpell(Search_Placement_Spell)
         PlayerRef.EquipSpell(Search_Placement_Spell, 0)
         PlayerRef.EquipSpell(Search_Placement_Spell, 1)
+        ObjectToPlace = FormHelper.HexToForm(formId)
     endIf
 endFunction
 
@@ -505,5 +506,7 @@ endFunction
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Object Placement Spell
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+Form property ObjectToPlace auto
 
 Spell property Search_Placement_Spell auto
