@@ -139,7 +139,7 @@ string function GetTriggeredKeyboardShortcutName(int keyCode, bool ctrlPressed, 
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Category Name Replacement
+; Category Name Replacement and Info
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 int property CategoryNameMap
@@ -179,6 +179,16 @@ string[] function GetCategoryDisplayNames(string[] categories)
         i += 1
     endWhile
     return displayNames
+endFunction
+
+bool function CategoryIsSpellType(string category)
+    return category == "SPEL" || category == "SHOU"
+endFunction
+
+bool function CategoryIsInventoryType(string category)
+    return category == "ALCH" || category == "INGR" || category == "KEYM" || \
+           category == "WEAP" || category == "ARMO" || category == "AMMO" || \
+           category == "SCRL" || category == "BOOK"
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -229,7 +239,193 @@ function ShowSearchCategorySelection(string query, int searchResults)
         Debug.MessageBox("No results found for '" + query + "'")
         return
     endIf
-    string category = GetUserSelection(GetCategoryDisplayNames(categoryNames))
+
+    bool anySpellTypes = false
+    bool anyItemTypes = false
+    int categoriesWithCounts = JArray.object()
+    int i = 0
+    while i < categoryNames.Length
+        string categoryName = categoryNames[i]
+        if CategoryIsSpellType(categoryName)
+            anySpellTypes = true
+        endIf
+        if CategoryIsInventoryType(categoryName)
+            anyItemTypes = true
+        endIf
+        string displayName = GetCategoryDisplayName(categoryName)
+        int count = Search.GetResultCategoryCount(searchResults, categoryName)
+        JArray.addStr(categoriesWithCounts, displayName + " (" + count + ")")
+        i += 1
+    endWhile
+
+    int options = JArray.object()
+    if anyItemTypes
+        JArray.addStr(options, "[View All Items]")
+    endIf
+    if anySpellTypes
+        JArray.addStr(options, "[View All Spells]")
+    endIf
+    JArray.addFromArray(options, categoriesWithCounts)
+
+    string categoryNameWithCount = GetUserSelection(JArray.asStringArray(options), showFilter = false)
+
+    if categoryNameWithCount
+        int categoryIndex = JArray.findStr(categoriesWithCounts, categoryNameWithCount)
+        string category = categoryNames[categoryIndex]
+        ShowCategory(searchResults, category)
+    endIf
+endFunction
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Category Subview
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+function ShowCategory(int searchResults, string category)
+    if category == "[View All Items]"
+
+    elseIf category == "[View All Spells]"
+
+    elseIf category == "CELL"
+        ShowCategory_Cell(searchResults)
+
+    elseIf category == "NPC_"
+        ShowCategory_Actors(searchResults)
+
+    elseIf category == "ARMO"
+        ShowCategory_Armor(searchResults)
+
+    else
+        Debug.MessageBox("Category not yet supported: " + category)
+    endIf
+endFunction
+
+function ShowCategory_Cell(int searchResults)
+    int selection = ShowSearchResultChooser(searchResults, "CELL", "~ Choose Cell to Teleport ~", showName = false, showEditorId = true, showFormId = false)
+    if selection >= 0
+        int result = Search.GetNthResultInCategory(searchResults, "CELL", selection)
+        string editorId = Search.GetResultEditorID(result)
+        Debug.CenterOnCell(editorId)
+    endIf
+endFunction
+
+function ShowCategory_Armor(int searchResults)
+
+endFunction
+
+function ShowCategory_Actors(int searchResults)
+
+endFunction
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Get Names of Items in Categories
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; Click on header: 0
+; Click on option 1:  -1
+; Click on option 2:  -2
+; Click on option 3:  -3
+int function ShowSearchResultChooser(int searchResults, string category, string header = "", bool showFilter = true, string filter = "", string option1 = "", string option2 = "", string option3 = "", bool showName = true, bool showFormId = true, bool showEditorId = false)
+    int optionsToShow = JArray.object()
+
+    UIListMenu listMenu = UIExtensions.GetMenu("UIListMenu") as UIListMenu
+
+    int currentIndex = 0
+
+    int headerIndex  = -1
+    int option1Index = -1
+    int option2Index = -1
+    int option3Index = -1
+    int filterIndex  = -1
+
+    if header
+        listMenu.AddEntryItem(header)
+        headerIndex = currentIndex
+        currentIndex += 1
+    endIf
+    if option1
+        listMenu.AddEntryItem(option1)
+        option1 = currentIndex
+        currentIndex += 1
+    endIf
+    if option2
+        listMenu.AddEntryItem(option2)
+        option2 = currentIndex
+        currentIndex += 1
+    endIf
+    if option3
+        listMenu.AddEntryItem(option3)
+        option3 = currentIndex
+        currentIndex += 1
+    endIf
+    if showFilter && ! filter
+        listMenu.AddEntryItem("[Filter List]")
+        filterIndex = currentIndex
+        currentIndex += 1
+    endIf
+
+    int count = Search.GetResultCategoryCount(searchResults, category)
+
+    int selectionIndexToNthIndex = JIntMap.object()
+
+    int itemIndex = 0
+    int i = 0
+    while i < count
+        int result = Search.GetNthResultInCategory(searchResults, category, i)
+        string name = Search.GetResultName(result)
+        string formId = Search.GetResultFormID(result)
+        string editorId = Search.GetResultEditorID(result)
+        string prefix = ""
+        string text = ""
+        if showName
+            text += name
+            prefix = " "
+        endIf
+        if showEditorId
+            text += prefix + editorId
+            prefix = " "
+        endIf
+        if showFormId
+            text += prefix + "(" + formId + ")"
+        endIf
+        if ! filter || StringUtil.Find(name + editorId, filter) > -1
+            JArray.addStr(optionsToShow, text)
+            listMenu.AddEntryItem(text)
+            JIntMap.setInt(selectionIndexToNthIndex, itemIndex, i)
+            itemIndex += 1
+        endIf
+        i += 1
+    endWhile
+
+    listMenu.OpenMenu()
+
+    int selection = listMenu.GetResultInt()
+
+    if selection > -1
+
+        if showFilter && selection == filterIndex
+            ; int function ShowSearchResultChooser(int searchResults, string category, string header = "", bool showFilter = true, string filter = "", string option1 = "", string option2 = "", string option3 = "", bool showName = true, bool showFormId = true, bool showEditorId = false)
+            return ShowSearchResultChooser(            searchResults,        category,        header,           showFilter,        GetUserInput(),            option1,             option2,             option3,           showName,             showFormId,             showEditorId)
+        else
+            ; Click on header:    -1
+            ; Click on option 1:  -2
+            ; Click on option 2:  -3
+            ; Click on option 3:  -4
+            if selection == headerIndex
+                return -1
+            elseIf selection == option1Index
+                return -2
+            elseIf selection == option2Index
+                return -3
+            elseIf selection == option3Index
+                return -4
+            else
+                ; Return the ACTUAL INDEX of the provided collection
+                int potentiallyFilteredItemIndex = selection - currentIndex
+                int originalIndex = JIntMap.getInt(selectionIndexToNthIndex, potentiallyFilteredItemIndex)
+                return originalIndex
+            endIf
+        endIf
+    endIf
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

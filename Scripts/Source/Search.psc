@@ -3,7 +3,7 @@ scriptName Search
 
 ; Returns the raw returned text from running `help "[query]"` in the console
 string function Help(string query) global
-
+    ; Check if console is currently open
     bool consoleOpen = UI.GetBool("Console", "_global.Console.ConsoleInstance.Shown")
 
     ; Is ConsoleUtil installed?
@@ -81,6 +81,10 @@ string function Help(string query) global
             Utility.WaitMenuMode(0.01)
         endWhile
     endIf
+
+    ; Remove this from the most recently run command list
+    int commandHistoryLength = UI.GetInt("Console", "_global.Console.ConsoleInstance.Commands.length")
+    UI.InvokeInt("Console", "_global.Console.ConsoleInstance.Commands.splice", commandHistoryLength - 1)
 
     return UI.GetString("Console", "_global.Console.ConsoleInstance.CommandHistory.text")
 endFunction

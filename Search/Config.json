@@ -7,11 +7,26 @@
         }
     },
     "category_names": {
-        "dial": "Dialogue",
-        "fact": "Faction",
-        "npc_": "Actor",
-        "keym": "Key",
-        "lctn": "Location",
-        "qust": "Quest"
+        "DIAL": "Dialogue",
+        "FACT": "Faction",
+        "NPC_": "Actor",
+        "KEYM": "Key",
+        "LCTN": "Location",
+        "QUST": "Quest",
+        "WEAP": "Weapon",
+        "ARMO": "Armor",
+        "HDPT": "Hair",
+        "LCRT": "Marker",
+        "AMMO": "Ammunition",
+        "MGEF": "Magical Effect",
+        "ENCH": "Enchantment",
+        "KYWD": "Keyword",
+        "SCRL": "Scroll",
+        "SHOU": "Shout",
+        "VTYP": "Voice Type",
+        "EXPL": "Explosion",
+        "FURN": "Furniture",
+        "INGR": "Ingredient",
+        "SPEL": "Spell"
     }
 }
