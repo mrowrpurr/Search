@@ -261,6 +261,7 @@ function ShowSearchCategorySelection(string query, int searchResults)
 
     bool anyItemTypes = false
     int categoriesWithCounts = JArray.object()
+    JValue.retain(categoriesWithCounts)
     int i = 0
     while i < categoryNames.Length
         string categoryName = categoryNames[i]
@@ -318,6 +319,8 @@ function ShowSearchCategorySelection(string query, int searchResults)
             ShowCategory(searchResults, category)
         endIf
     endIf
+
+    JValue.release(categoriesWithCounts)
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -828,6 +831,7 @@ int function ShowSearchResultChooser(int searchResults, string category, string 
     int count = Search.GetResultCategoryCount(searchResults, category)
 
     int selectionIndexToNthIndex = JIntMap.object()
+    JValue.retain(selectionIndexToNthIndex)
 
     int itemIndex = 0
     int i = 0
@@ -865,6 +869,7 @@ int function ShowSearchResultChooser(int searchResults, string category, string 
     if selection > -1
 
         if showFilter && selection == filterIndex
+            JValue.release(selectionIndexToNthIndex)
             ; int function ShowSearchResultChooser(int searchResults, string category, string header = "", bool showFilter = true, string filter = "", string option1 = "", string option2 = "", string option3 = "", bool showName = true, bool showFormId = true, bool showEditorId = false)
             return ShowSearchResultChooser(            searchResults,        category,        header,           showFilter,        GetUserInput(),            option1,             option2,             option3,           showName,             showFormId,             showEditorId)
         else
@@ -884,6 +889,7 @@ int function ShowSearchResultChooser(int searchResults, string category, string 
                 ; Return the ACTUAL INDEX of the provided collection
                 int potentiallyFilteredItemIndex = selection - currentIndex
                 int originalIndex = JIntMap.getInt(selectionIndexToNthIndex, potentiallyFilteredItemIndex)
+                JValue.release(selectionIndexToNthIndex)
                 return originalIndex
             endIf
         endIf
@@ -931,6 +937,7 @@ endFunction
 
 string function GetUserSelection(string[] options, bool showFilter = true, string filter = "") global
     int optionsToShow = JArray.object()
+    JValue.retain(optionsToShow)
 
     UIListMenu listMenu = UIExtensions.GetMenu("UIListMenu") as UIListMenu
     if showFilter
@@ -953,13 +960,17 @@ string function GetUserSelection(string[] options, bool showFilter = true, strin
 
     if selection > -1
         if selection == 0 && showFilter
-            return GetUserSelection(JArray.asStringArray(optionsToShow), showFilter = true, filter = GetUserInput())
+            string[] theOptions = JArray.asStringArray(optionsToShow)
+            JValue.release(optionsToShow)
+            return GetUserSelection(theOptions, showFilter = true, filter = GetUserInput())
         else
             int index = selection
             if showFilter
                 index = selection - 1
             endIf
-            return JArray.getStr(optionsToShow, index)
+            string option = JArray.getStr(optionsToShow, index)
+            JValue.release(optionsToShow)
+            return option
         endIf
     endIf
 endFunction
