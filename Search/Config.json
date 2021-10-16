@@ -27,6 +27,8 @@
         "EXPL": "Explosion",
         "FURN": "Furniture",
         "INGR": "Ingredient",
-        "SPEL": "Spell"
+        "SPEL": "Spell",
+        "WOOP": "Word of Power",
+        "MESG": "Message"
     }
 }

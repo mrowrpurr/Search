@@ -197,10 +197,6 @@ string[] function GetCategoryDisplayNames(string[] categories)
     return displayNames
 endFunction
 
-bool function CategoryIsSpellType(string category)
-    return category == "SPEL" || category == "SHOU"
-endFunction
-
 bool function CategoryIsInventoryType(string category)
     return category == "ALCH" || category == "INGR" || category == "KEYM" || \
            category == "WEAP" || category == "ARMO" || category == "AMMO" || \
@@ -261,15 +257,11 @@ function ShowSearchCategorySelection(string query, int searchResults)
         return
     endIf
 
-    bool anySpellTypes = false
     bool anyItemTypes = false
     int categoriesWithCounts = JArray.object()
     int i = 0
     while i < categoryNames.Length
         string categoryName = categoryNames[i]
-        if CategoryIsSpellType(categoryName)
-            anySpellTypes = true
-        endIf
         if CategoryIsInventoryType(categoryName)
             anyItemTypes = true
         endIf
@@ -282,9 +274,6 @@ function ShowSearchCategorySelection(string query, int searchResults)
     int options = JArray.object()
     if anyItemTypes
         JArray.addStr(options, "[View All Items]")
-    endIf
-    if anySpellTypes
-        JArray.addStr(options, "[View All Spells]")
     endIf
     JArray.addFromArray(options, categoriesWithCounts)
 
@@ -336,8 +325,6 @@ endFunction
 function ShowCategory(int searchResults, string category)
     if category == "[View All Items]"
 
-    elseIf category == "[View All Spells]"
-
     elseIf category == "CELL"
         ShowCategory_Cell(searchResults)
 
@@ -358,6 +345,12 @@ function ShowCategory(int searchResults, string category)
 
     elseIf category == "SPEL"
         ShowCategory_Spell(searchResults)
+
+    elseIf category == "SHOU"
+        ShowCategory_Shout(searchResults)
+
+    elseIf category == "WOOP"
+        ShowCategory_WordOfPower(searchResults)
 
     elseIf category == "LCRT"
         Debug.MessageBox("Markers aren't yet really useful, we'll make it so you can move them, move TO them, and SEE them by changing the .ini settings")
@@ -552,6 +545,43 @@ function ShowCategory_Spell(int searchResults)
         string formId = Search.GetResultFormID(result)
         Spell theSpell = FormHelper.HexToForm(formId) as Spell
         Debug.MessageBox(theSpell + " " + theSpell.GetName())
+    endIf
+endFunction
+
+function ShowCategory_Shout(int searchResults)
+    int selection = ShowSearchResultChooser(searchResults, "SHOU", "~ Choose Shout ~", showName = true, showEditorId = true, showFormId = true)
+    if selection > -1
+        int result = Search.GetNthResultInCategory(searchResults, "SHOU", selection)
+        string editorId = Search.GetResultEditorID(result)
+        string formId = Search.GetResultFormID(result)
+        Shout theShout = FormHelper.HexToForm(formId) as Shout
+        int i = 0
+        bool loop = true
+        while loop
+            WordOfPower word = theShout.GetNthWordOfPower(i)
+            if word
+                Game.TeachWord(word)
+                Game.UnlockWord(word)
+            else
+                loop = false
+            endIf
+            i += 1
+        endWhile
+        PlayerRef.AddShout(theShout)
+        Debug.MessageBox("Taught player " + theShout.GetName())
+    endIf
+    PlayerRef.ModActorValue("DragonSouls", 13)
+endFunction
+
+function ShowCategory_WordOfPower(int searchResults)
+    int selection = ShowSearchResultChooser(searchResults, "WOOP", "~ Choose Word of Power ~", showName = true, showEditorId = true, showFormId = true)
+    if selection > -1
+        int result = Search.GetNthResultInCategory(searchResults, "WOOP", selection)
+        string editorId = Search.GetResultEditorID(result)
+        string formId = Search.GetResultFormID(result)
+        WordOfPower theWord = FormHelper.HexToForm(formId) as WordOfPower
+        Game.TeachWord(theWord)
+        Debug.MessageBox("Player has now learned the word " + theWord.GetName())
     endIf
 endFunction
 
