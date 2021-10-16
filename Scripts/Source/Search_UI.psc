@@ -333,6 +333,9 @@ function ShowCategory(int searchResults, string category)
     elseIf category == "CELL"
         ShowCategory_Cell(searchResults)
 
+    elseIf category == "DIAL"
+        ShowCategory_Dialogue(searchResults)
+
     elseIf category == "NPC_"
         ShowCategory_Actors(searchResults)
 
@@ -748,6 +751,25 @@ function ShowCategory_Idle(int searchResults)
         ; elseIf weaponAction == "Set Enchantment Magnitude"
 
         ; endIf
+    endIf
+endFunction
+
+function ShowCategory_Dialogue(int searchResults)
+    int selection = ShowSearchResultChooser(searchResults, "DIAL", "~ Choose Dialogue Topic ~", showName = false, showEditorId = true, showFormId = false)
+    if selection > -1
+        int result = Search.GetNthResultInCategory(searchResults, "DIAL", selection)
+        string editorId = Search.GetResultEditorID(result)
+        string formId = Search.GetResultFormID(result)
+
+        Actor cursorActor = Game.GetCurrentCrosshairRef() as Actor
+
+        if cursorActor
+            ConsoleUtil.SetSelectedReference(cursorActor)
+            Debug.MessageBox(cursorActor.GetActorBase().GetName() + " say " + editorId)
+        else
+            Debug.MessageBox("say " + editorId)
+            ConsoleUtil.ExecuteCommand("say " + editorId)
+        endIf
     endIf
 endFunction
 

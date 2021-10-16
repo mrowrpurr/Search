@@ -11,10 +11,10 @@ https://en.uesp.net/wiki/Skyrim_Mod:Mod_File_Format
 - `Cell`
 - `ALCH` Food & Potions
 - `QUST` Quest
+- `DIAL` Dialogue
 
 ### In Progress
 
-- _General_ ~ When you leave the menu open for too long, it doesn't work
 - _General_ ~ When you click `[View All Items]` it does not respect the `[Filter]`
 
 ### Not Started
