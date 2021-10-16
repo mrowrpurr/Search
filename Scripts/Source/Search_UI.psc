@@ -232,7 +232,7 @@ function ClearPreviouslySavedSearchResults()
     JArray.clear(SearchResultsArray)
 endFunction
 
-; TODO - No array, use 1 object instead of saving all search result
+; TODO - Clean up old ones when you search using the MAIN SEARCH UI - note that some searched do sub-searched
 function SaveSearchResult(int resultId)
     JArray.addObj(SearchResultsArray, resultId)
 endFunction
@@ -812,17 +812,18 @@ endFunction
 ; Click on option 1:  -2
 ; Click on option 2:  -3
 ; Click on option 3:  -4
-int function ShowSearchResultChooser(int searchResults, string category, string header = "", bool showFilter = true, string filter = "", string option1 = "", string option2 = "", string option3 = "", bool showName = true, bool showFormId = true, bool showEditorId = false)
+int function ShowSearchResultChooser(int searchResults, string category, string header = "", bool showFilter = true, string filter = "", bool showPluginFilter = true, string pluginFilter = "", string option1 = "", string option2 = "", string option3 = "", bool showName = true, bool showFormId = true, bool showEditorId = false)
     int optionsToShow = JArray.object()
 
     UIListMenu listMenu = UIExtensions.GetMenu("UIListMenu") as UIListMenu
 
-    int currentIndex = 0
-    int headerIndex  = -1
-    int option1Index = -1
-    int option2Index = -1
-    int option3Index = -1
-    int filterIndex  = -1
+    int currentIndex      = 0
+    int headerIndex       = -1
+    int option1Index      = -1
+    int option2Index      = -1
+    int option3Index      = -1
+    int filterIndex       = -1
+    int pluginFilterIndex = -1
 
     if header
         listMenu.AddEntryItem(header)
@@ -844,9 +845,22 @@ int function ShowSearchResultChooser(int searchResults, string category, string 
         option3Index = currentIndex
         currentIndex += 1
     endIf
-    if showFilter && ! filter
-        listMenu.AddEntryItem("[Filter List]")
+    if showFilter
+        if filter
+            listMenu.AddEntryItem("[\"" + filter + "\"]")
+        else
+            listMenu.AddEntryItem("[Filter List]")
+        endIf
         filterIndex = currentIndex
+        currentIndex += 1
+    endIf
+    if showPluginFilter && ! pluginFilter
+        if pluginFilter
+            listMenu.AddEntryItem("[" + pluginFilter + "]")
+        else
+            listMenu.AddEntryItem("[Filter by Plugin]")
+        endIf
+        pluginFilterIndex = currentIndex
         currentIndex += 1
     endIf
 
@@ -876,10 +890,12 @@ int function ShowSearchResultChooser(int searchResults, string category, string 
             text += prefix + "(" + formId + ")"
         endIf
         if ! filter || StringUtil.Find(name + editorId + formId, filter) > -1
-            JArray.addStr(optionsToShow, text)
-            listMenu.AddEntryItem(text)
-            JIntMap.setInt(selectionIndexToNthIndex, itemIndex, i)
-            itemIndex += 1
+            if ! pluginFilter || FormHelper.HexToModName(formId) == pluginFilter
+                JArray.addStr(optionsToShow, text)
+                listMenu.AddEntryItem(text)
+                JIntMap.setInt(selectionIndexToNthIndex, itemIndex, i)
+                itemIndex += 1
+            endIf
         endIf
         i += 1
     endWhile
@@ -892,8 +908,32 @@ int function ShowSearchResultChooser(int searchResults, string category, string 
 
         if showFilter && selection == filterIndex
             JValue.release(selectionIndexToNthIndex)
-            ; int function ShowSearchResultChooser(int searchResults, string category, string header = "", bool showFilter = true, string filter = "", string option1 = "", string option2 = "", string option3 = "", bool showName = true, bool showFormId = true, bool showEditorId = false)
-            return ShowSearchResultChooser(            searchResults,        category,        header,           showFilter,        GetUserInput(),            option1,             option2,             option3,           showName,             showFormId,             showEditorId)
+            return ShowSearchResultChooser(searchResults, category, \
+                header           = header, \
+                showFilter       = showFilter, \
+                filter           = GetUserInput(), \
+                showPluginFilter = showPluginFilter, \
+                pluginFilter     = pluginFilter, \
+                option1          = option1, \
+                option2          = option2, \
+                option3          = option3, \
+                showName         = showName, \
+                showFormId       = showFormId, \
+                showEditorId     = showEditorId)
+        elseIf showPluginFilter && selection == pluginFilterIndex
+            JValue.release(selectionIndexToNthIndex)
+            return ShowSearchResultChooser(searchResults, category, \
+                header           = header, \
+                showFilter       = showFilter, \
+                filter           = filter, \
+                showPluginFilter = showPluginFilter, \
+                pluginFilter     = GetUserInput(), \
+                option1          = option1, \
+                option2          = option2, \
+                option3          = option3, \
+                showName         = showName, \
+                showFormId       = showFormId, \
+                showEditorId     = showEditorId)
         else
             ; Click on header:    -1
             ; Click on option 1:  -2

@@ -12,6 +12,7 @@ https://en.uesp.net/wiki/Skyrim_Mod:Mod_File_Format
 - `ALCH` Food & Potions
 - `QUST` Quest
 - `DIAL` Dialogue
+- `IMAD` Image Space Modifiers
 
 ### In Progress
 
