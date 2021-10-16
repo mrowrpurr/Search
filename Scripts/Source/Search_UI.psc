@@ -367,7 +367,26 @@ function ShowCategory(int searchResults, string category)
         Debug.MessageBox("Markers aren't yet really useful, we'll make it so you can move them, move TO them, and SEE them by changing the .ini settings")
         ShowCategory_Marker(searchResults)
 
-    else
+    elseIf CategoryIsInventoryType(category)
+        int selection = ShowSearchResultChooser(searchResults, category, "~ " + GetCategoryDisplayName(category) + " ~", showName = true, showEditorId = true, showFormId = true, option1 = "[View All Items]")
+        if selection == -2
+            ; VIEW ALL
+        elseIf selection > -1
+            int result = Search.GetNthResultInCategory(searchResults, category, selection)
+            string editorId = Search.GetResultEditorID(result)
+            string formId = Search.GetResultFormID(result)
+            Form theItem = FormHelper.HexToForm(formId) as Form
+            int count = 1
+            if theItem.GetType() == 42 ; AMMO
+                count = 50
+            endIf
+            count = GetUserInput(count) as int
+            if count > 0
+                PlayerRef.AddItem(theItem, count)
+            endIf
+        endIf
+
+    else        
         Debug.Notification("Category not yet supported: " + category)
         ShowSearchResultChooser(searchResults, category, "~ Not Yet Supported ~", showName = true, showEditorId = true, showFormId = true)
     endIf
