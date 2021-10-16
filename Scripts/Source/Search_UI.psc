@@ -354,12 +354,19 @@ function ShowCategory(int searchResults, string category)
     elseIf category == "WOOP"
         ShowCategory_WordOfPower(searchResults)
 
+    elseIf category == "IDLE"
+        ShowCategory_Idle(searchResults)
+
+    elseIf category == "IMAD"
+        ShowCategory_ImageSpaceModifier(searchResults)
+
     elseIf category == "LCRT"
         Debug.MessageBox("Markers aren't yet really useful, we'll make it so you can move them, move TO them, and SEE them by changing the .ini settings")
         ShowCategory_Marker(searchResults)
 
     else
-        Debug.MessageBox("Category not yet supported: " + category)
+        Debug.Notification("Category not yet supported: " + category)
+        ShowSearchResultChooser(searchResults, category, "~ Not Yet Supported ~", showName = true, showEditorId = true, showFormId = true)
     endIf
 endFunction
 
@@ -498,7 +505,6 @@ function ShowCategory_Weapon(int searchResults)
         JArray.addStr(listOptions, "Edit Base Damage")
         JArray.addStr(listOptions, "Edit Critical Damage")
         JArray.addStr(listOptions, "Edit Weapon Type")
-        JArray.addStr(listOptions, "Edit Weapon Skill")
         JArray.addStr(listOptions, "Edit ...")
         ; Equip Type?
         JArray.addStr(listOptions, "Set Enchantment")
@@ -515,77 +521,23 @@ function ShowCategory_Weapon(int searchResults)
             Debug.MessageBox("Changed " + theWeapon.GetName() + " base damage from " + originalBaseDamage + " to " + newBaseDamage)
 
         elseIf weaponAction == "Edit Critical Damage"
-
+            ; TODO
 
         elseIf weaponAction == "Edit Weapon Type"
-            int originalType = theWeapon.GetWeaponType()
-
-
-        elseIf weaponAction == "Edit Weapon Skill"
-
+            string originalTypeName = GetWeaponTypeName(theWeapon.GetWeaponType())
+            string newTypeName = GetUserSelection(JMap.allKeysPArray(WeaponTypesMap))
+            if newTypeName
+                int newTypeId = GetWeaponIdFromName(newTypeName)
+                theWeapon.SetWeaponType(newTypeId)
+                Debug.MessageBox("Changed " + theWeapon.GetName() + " type from " + originalTypeName + " to " + newTypeName)
+            endIf
 
         elseIf weaponAction == "Set Enchantment"
-
-
+            
         elseIf weaponAction == "Set Enchantment Magnitude"
 
         endIf
     endIf
-
-
-    ;     if armorAction == "Edit Armor Rating"
-    ;         int armorRating = GetUserInput(theArmor.GetArmorRating()) as int
-    ;         theArmor.SetArmorRating(armorRating)
-    ;         Debug.MessageBox("Set the armor rating of " + theArmor.GetName() + "  to " + armorRating)
-    ;     elseIf armorAction == "Edit Armor Type"
-
-    ;     elseIf armorAction == "Set Enchantment"
-    ;         Enchantment theEnchantmentOnArmor
-    ;         while ! theEnchantmentOnArmor
-    ;             int enchantmentResult = ChooseEnchantment()
-    ;             string enchantmentFormId = Search.GetResultFormID(enchantmentResult)
-    ;             Enchantment theEnchantment = FormHelper.HexToForm(enchantmentFormId) as Enchantment
-    ;             if theEnchantment
-    ;                 theArmor.SetEnchantment(theEnchantment)
-    ;                 theEnchantmentOnArmor = theArmor.GetEnchantment()
-    ;                 if theEnchantmentOnArmor
-    ;                     if theEnchantmentOnArmor == theEnchantment
-    ;                         Debug.MessageBox("Applied enchantment " + theEnchantment.GetName() + " to " + theArmor.GetName())
-    ;                     else
-    ;                         theEnchantmentOnArmor = None
-    ;                     endIf
-    ;                 endIf
-    ;             endIf
-    ;         endWhile
-
-    ;     elseIf armorAction == "Set Enchantment Magnitude"
-    ;         Enchantment theEnchantment = theArmor.GetEnchantment()
-    ;         int effectIndex = ChooseNthEnchantmentMagicEffect(theEnchantment)
-    ;         float originalMagnitude = theEnchantment.GetNthEffectMagnitude(effectIndex)
-    ;         float magnitude = GetUserInput(originalMagnitude) as float
-    ;         theEnchantment.SetNthEffectMagnitude(effectIndex, magnitude) 
-    ;         MagicEffect theEffect = theEnchantment.GetNthEffectMagicEffect(effectIndex)
-    ;         Debug.MessageBox("Changed magnitude of " + theEffect.GetName() + " from " + originalMagnitude + " to " + magnitude)
-
-    ;     elseIf armorAction == "Set Slot Mask"
-
-    ;     endIf
-
-    ; elseIf selection == -2
-    ;     ; View All Items
-    ;     ItemAndSpellStorage.RemoveAllItems()
-    ;     int count = Search.GetResultCategoryCount(searchResults, "ARMO")
-    ;     int i = 0
-    ;     while i < count
-    ;         int item = Search.GetNthResultInCategory(searchResults, "ARMO", i)
-    ;         string formId = Search.GetResultFormID(item)
-    ;         Form theForm = FormHelper.HexToForm(formId)
-    ;         ItemAndSpellStorage.AddItem(theForm)
-    ;         i += 1
-    ;     endWhile
-    ;     ItemAndSpellStorage.GetActorBase().SetName("Items")
-    ;     ItemAndSpellStorage.OpenInventory(abForceOpen = true)
-    ; endIf
 endFunction
 
 function ShowCategory_Actors(int searchResults)
@@ -646,7 +598,20 @@ function ShowCategory_Spell(int searchResults)
         string editorId = Search.GetResultEditorID(result)
         string formId = Search.GetResultFormID(result)
         Spell theSpell = FormHelper.HexToForm(formId) as Spell
-        Debug.MessageBox(theSpell + " " + theSpell.GetName())
+        PlayerRef.AddSpell(theSpell)
+        Debug.MessageBox("Added " + theSpell.GetName() + " the player")
+    endIf
+endFunction
+
+function ShowCategory_ImageSpaceModifier(int searchResults)
+    int selection = ShowSearchResultChooser(searchResults, "IMAD", "~ Choose Image Space Modifier to Preview ~", showName = true, showEditorId = true, showFormId = true)
+    if selection > -1
+        int result = Search.GetNthResultInCategory(searchResults, "IMAD", selection)
+        string editorId = Search.GetResultEditorID(result)
+        string formId = Search.GetResultFormID(result)
+        ImageSpaceModifier theImad = FormHelper.HexToForm(formId) as ImageSpaceModifier
+        theImad.Apply(1.0)
+        Debug.MessageBox("Applied " + editorId)
     endIf
 endFunction
 
@@ -687,6 +652,58 @@ function ShowCategory_WordOfPower(int searchResults)
     endIf
 endFunction
 
+function ShowCategory_Idle(int searchResults)
+    int selection = ShowSearchResultChooser(searchResults, "IDLE", "~ Choose Idle to Play ~", showName = false, showEditorId = true, showFormId = true)
+    if selection > -1
+        int result = Search.GetNthResultInCategory(searchResults, "IDLE", selection)
+        string editorId = Search.GetResultEditorID(result)
+        string formId = Search.GetResultFormID(result)
+        Idle theIdle = FormHelper.HexToForm(formId) as Idle
+
+        Actor cursorActor = Game.GetCurrentCrosshairRef() as Actor
+
+        if cursorActor
+            int listOptions = JArray.object()
+            JArray.addStr(listOptions, "[" + editorId + "]")
+            JArray.addStr(listOptions, "Player Play Idle")
+            JArray.addStr(listOptions, "NPC Play Idle")
+            string idleAction = GetUserSelection(JArray.asStringArray(listOptions))
+            if idleAction == "Player Play Idle"
+                PlayerRef.PlayIdle(theIdle)
+            elseIf idleAction == "NPC Play Idle"
+                Debug.SendAnimationEvent(cursorActor, editorId)
+            endIf
+        else
+            PlayerRef.PlayIdle(theIdle)
+        endIf
+
+
+        ; if weaponAction == "Edit Base Damage"
+        ;     int originalBaseDamage = theWeapon.GetBaseDamage()
+        ;     int newBaseDamage = GetUserInput(originalBaseDamage) as int
+        ;     theWeapon.SetBaseDamage(newBaseDamage)
+        ;     Debug.MessageBox("Changed " + theWeapon.GetName() + " base damage from " + originalBaseDamage + " to " + newBaseDamage)
+
+        ; elseIf weaponAction == "Edit Critical Damage"
+        ;     ; TODO
+
+        ; elseIf weaponAction == "Edit Weapon Type"
+        ;     string originalTypeName = GetWeaponTypeName(theWeapon.GetWeaponType())
+        ;     string newTypeName = GetUserSelection(JMap.allKeysPArray(WeaponTypesMap))
+        ;     if newTypeName
+        ;         int newTypeId = GetWeaponIdFromName(newTypeName)
+        ;         theWeapon.SetWeaponType(newTypeId)
+        ;         Debug.MessageBox("Changed " + theWeapon.GetName() + " type from " + originalTypeName + " to " + newTypeName)
+        ;     endIf
+
+        ; elseIf weaponAction == "Set Enchantment"
+            
+        ; elseIf weaponAction == "Set Enchantment Magnitude"
+
+        ; endIf
+    endIf
+endFunction
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Weapon Types
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -711,7 +728,11 @@ string function GetWeaponTypeName(int weaponType)
 endFunction
 
 int function GetWeaponIdFromName(string name)
-    return JMap.getInt(WeaponTypesMap, name)
+    if JMap.hasKey(WeaponTypesMap, name)
+        return JMap.getInt(WeaponTypesMap, name)
+    else
+        return -1
+    endIf
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

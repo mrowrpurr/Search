@@ -29,7 +29,10 @@
         "INGR": "Ingredient",
         "SPEL": "Spell",
         "WOOP": "Word of Power",
-        "MESG": "Message"
+        "MESG": "Message",
+        "ALCH": "Food & Potions",
+        "ACTI": "Activators",
+        "IMAD": "Image Space Modifier"
     },
     "weapon_types": {
         "Fist": 0,
