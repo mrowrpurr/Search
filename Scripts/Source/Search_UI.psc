@@ -234,6 +234,7 @@ function ClearPreviouslySavedSearchResults()
     JArray.clear(SearchResultsArray)
 endFunction
 
+; TODO - No array, use 1 object instead of saving all search result
 function SaveSearchResult(int resultId)
     JArray.addObj(SearchResultsArray, resultId)
 endFunction
@@ -354,6 +355,9 @@ function ShowCategory(int searchResults, string category)
 
     elseIf category == "QUST"
         ShowCategory_Quest(searchResults)
+
+    elseIf category == "SPEL"
+        ShowCategory_Spell(searchResults)
 
     elseIf category == "LCRT"
         Debug.MessageBox("Markers aren't yet really useful, we'll make it so you can move them, move TO them, and SEE them by changing the .ini settings")
@@ -531,6 +535,23 @@ function ShowCategory_Marker(int searchResults)
         ; PlayerRef.EquipSpell(Search_Placement_Spell, 0)
         ; PlayerRef.EquipSpell(Search_Placement_Spell, 1)
         ; ObjectToPlace = FormHelper.HexToForm(formId)
+    endIf
+endFunction
+
+function ShowCategory_Spell(int searchResults)
+    int selection = ShowSearchResultChooser(searchResults, "SPEL", "~ ChooseSpell ~", showName = true, showEditorId = true, showFormId = true, option1 = "[View All Spells]")
+    if selection == -2
+        ; View All Spells
+        RemoveAllSpells(ItemAndSpellStorage)
+        AddAllSpellsToItemAndSpellStorage(searchResults)
+        ShowSpellTradingMenu()
+
+    elseIf selection > -1
+        int result = Search.GetNthResultInCategory(searchResults, "SPEL", selection)
+        string editorId = Search.GetResultEditorID(result)
+        string formId = Search.GetResultFormID(result)
+        Spell theSpell = FormHelper.HexToForm(formId) as Spell
+        Debug.MessageBox(theSpell + " " + theSpell.GetName())
     endIf
 endFunction
 
@@ -731,6 +752,61 @@ Spell property Search_Placement_Spell auto
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Actor property ItemAndSpellStorage auto
+Actor property FakePlayerForSpellUI auto
+UIMagicMenu property MagicMenu auto
+
+function RemoveAllSpells(actor theActor)
+    int count = theActor.GetSpellCount()
+    int i = 0
+    while i < count
+        theActor.RemoveSpell(theActor.GetNthSpell(0))
+        i += 1
+    endWhile
+endFunction
+
+function AddAllSpellsToItemAndSpellStorage(int searchResults)
+    int spellCount = Search.GetResultCategoryCount(searchResults, "SPEL")
+    int i = 0 
+    while i < spellCount
+        int spellResult = Search.GetNthResultInCategory(searchResults, "SPEL", i)
+        string formId = Search.GetResultFormID(spellResult)
+        Spell theSpell = FormHelper.HexToForm(formId) as Spell
+        ItemAndSpellStorage.AddSpell(theSpell)
+        i += 1
+    endWhile
+endFunction
+
+function ShowSpellTradingMenu()
+    ItemAndSpellStorage.GetActorBase().SetName("Spells")
+    MagicMenu = UIExtensions.GetMenu("UIMagicMenu") as UIMagicMenu
+    MagicMenu.SetPropertyForm("receivingActor", PlayerRef)
+    StartListeningToSpellMenuEvents()
+    MagicMenu.OpenMenu(ItemAndSpellStorage)
+endFunction
+
+function StartListeningToSpellMenuEvents()
+	RegisterForModEvent("UIMagicMenu_CloseMenu", "SpellMenu_OnClose")
+	RegisterForModEvent("UIMagicMenu_AddRemoveSpell", "SpellMenu_OnSpellAddRemove")
+endFunction
+
+function StopListeningToSpellMenuEvents()
+	UnregisterForModEvent("UIMagicMenu_CloseMenu")
+	UnregisterForModEvent("UIMagicMenu_AddRemoveSpell")
+endFunction
+
+event SpellMenu_OnSpellAddRemove(string eventName, string strArg, float fltArg, Form sender)
+    Spell theSpell = sender as Spell
+    PlayerRef.AddSpell(theSpell)
+    ; MagicMenu.SetPropertyForm("AddSpell", theSpell)
+    RemoveAllSpells(FakePlayerForSpellUI)
+    FakePlayerForSpellUI.GetActorBase().SetName(PlayerRef.GetActorBase().GetName())
+    FakePlayerForSpellUI.AddSpell(theSpell)
+    UI.InvokeForm("CustomMenu", "_root.Menu_mc.MagicMenu_SetSecondaryActor", FakePlayerForSpellUI)
+endEvent
+
+event SpellMenu_OnClose(string eventName, string strArg, float fltArg, Form sender)
+    StopListeningToSpellMenuEvents()
+endEvent
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Items
