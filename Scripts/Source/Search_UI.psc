@@ -285,7 +285,7 @@ function ShowSearchCategorySelection(string query, int searchResults)
         if categoryNameWithCount == "[View All Items]"
             CurrentNotification = "Loading Items"
             RegisterForSingleUpdate(0.0)
-            ItemAndSpellStorage.RemoveAllItems()
+            ResetInventoryView()
             i = 0
             while i < categoryNames.Length
                 string categoryName = categoryNames[i]
@@ -297,9 +297,9 @@ function ShowSearchCategorySelection(string query, int searchResults)
                         string formId = Search.GetResultFormID(item)
                         Form theForm = FormHelper.HexToForm(formId)
                         if theForm.GetType() == 42 ; AMMO
-                            ItemAndSpellStorage.AddItem(theForm, 50)
+                            AddToInventoryView(theForm, 50)
                         else
-                            ItemAndSpellStorage.AddItem(theForm)
+                            AddToInventoryView(theForm)
                         endIf
                         categoryIndex += 1
                     endWhile
@@ -307,7 +307,7 @@ function ShowSearchCategorySelection(string query, int searchResults)
                 i += 1
             endWhile
             CurrentNotification = ""
-            ItemAndSpellStorage.OpenInventory(abForceOpen = true)
+            ShowInventoryView()
             
         elseIf categoryNameWithCount == "[View All Spells]"
             Debug.MessageBox("TODO")
@@ -370,7 +370,8 @@ function ShowCategory(int searchResults, string category)
     elseIf CategoryIsInventoryType(category)
         int selection = ShowSearchResultChooser(searchResults, category, "~ " + GetCategoryDisplayName(category) + " ~", showName = true, showEditorId = true, showFormId = true, option1 = "[View All Items]")
         if selection == -2
-            ; VIEW ALL
+            ShowInventoryViewForCategory(searchResults, category)
+
         elseIf selection > -1
             int result = Search.GetNthResultInCategory(searchResults, category, selection)
             string editorId = Search.GetResultEditorID(result)
@@ -499,18 +500,7 @@ function ShowCategory_Armor(int searchResults)
 
     elseIf selection == -2
         ; View All Items
-        ItemAndSpellStorage.RemoveAllItems()
-        int count = Search.GetResultCategoryCount(searchResults, "ARMO")
-        int i = 0
-        while i < count
-            int item = Search.GetNthResultInCategory(searchResults, "ARMO", i)
-            string formId = Search.GetResultFormID(item)
-            Form theForm = FormHelper.HexToForm(formId)
-            ItemAndSpellStorage.AddItem(theForm)
-            i += 1
-        endWhile
-        ItemAndSpellStorage.GetActorBase().SetName("Items")
-        ItemAndSpellStorage.OpenInventory(abForceOpen = true)
+        ShowInventoryViewForCategory(searchResults, "ARMO")
     endIf
 endFunction
 
@@ -967,6 +957,33 @@ Spell property Search_Placement_Spell auto
 Actor       property ItemAndSpellStorage  auto
 Actor       property FakePlayerForSpellUI auto
 UIMagicMenu property MagicMenu            auto
+
+function ShowInventoryViewForCategory(int searchResults, string category)
+    ResetInventoryView()
+    int count = Search.GetResultCategoryCount(searchResults, category)
+    int i = 0
+    while i < count
+        int item = Search.GetNthResultInCategory(searchResults, category, i)
+        string formId = Search.GetResultFormID(item)
+        Form theForm = FormHelper.HexToForm(formId)
+        AddToInventoryView(theForm)
+        i += 1
+    endWhile
+    ShowInventoryView()
+endFunction
+
+function ResetInventoryView()
+    ItemAndSpellStorage.RemoveAllItems()
+endFunction
+
+function AddToInventoryView(Form theForm, int count = 1)
+    ItemAndSpellStorage.AddItem(theForm)
+endFunction
+
+function ShowInventoryView()
+    ItemAndSpellStorage.GetActorBase().SetName("Items")
+    ItemAndSpellStorage.OpenInventory(abForceOpen = true)
+endFunction
 
 function RemoveAllSpells(actor theActor)
     int count = theActor.GetSpellCount()
