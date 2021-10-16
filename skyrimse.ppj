@@ -27,6 +27,9 @@
         <!-- UI Dependencies -->
         <Import>@ImportsFolder\UIExtensions\Scripts\Source</Import>
         <Import>C:\Steam\steamapps\common\Skyrim Special Edition\Data\Scripts\Source</Import>
+
+        <!-- Testing -->
+        <Import>@ImportsFolder\PapyrusUtil\Scripts\Source</Import>
     </Imports>
     <Folders>
         <!-- Relative path to folder containing .psc Papyrus source code files for this project -->

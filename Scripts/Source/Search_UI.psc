@@ -26,6 +26,20 @@ function Setup()
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; OnUpdate
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+string CurrentNotification
+float  CurrentNotificationInterval = 2.0
+
+event OnUpdate()
+    if CurrentNotification
+        Debug.Notification(CurrentNotification)
+        RegisterForSingleUpdate(CurrentNotificationInterval)
+    endIf
+endEvent
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Versioning
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -202,12 +216,16 @@ string property SearchResultsPath_Root = ".search.results" autoReadonly
 function OpenSearchPrompt()
     string query = GetUserInput()
     if query
+        CurrentNotification = "Searching..."
+        RegisterForSingleUpdate(0.0)
         int searchResults = Search.ExecuteSearch(query)
+        SaveSearchResult(searchResults)
+        Search.SaveResultToFile(searchResults, "_SearchResults_.json")
+        CurrentNotification = ""
         if ! searchResults
             Debug.MessageBox("Search for '" + query + "' failed")
             return
         endIf
-        SaveSearchResult(searchResults)
         ShowSearchCategorySelection(query, searchResults)
     endIf
 endFunction
@@ -272,9 +290,41 @@ function ShowSearchCategorySelection(string query, int searchResults)
     string categoryNameWithCount = GetUserSelection(JArray.asStringArray(options), showFilter = false)
 
     if categoryNameWithCount
-        int categoryIndex = JArray.findStr(categoriesWithCounts, categoryNameWithCount)
-        string category = categoryNames[categoryIndex]
-        ShowCategory(searchResults, category)
+        if categoryNameWithCount == "[View All Items]"
+            CurrentNotification = "Loading Items"
+            RegisterForSingleUpdate(0.0)
+            ItemAndSpellStorage.RemoveAllItems()
+            i = 0
+            while i < categoryNames.Length
+                string categoryName = categoryNames[i]
+                if CategoryIsInventoryType(categoryName)
+                    int categoryCount = Search.GetResultCategoryCount(searchResults, categoryName)
+                    int categoryIndex = 0
+                    while categoryIndex < categoryCount
+                        int item = Search.GetNthResultInCategory(searchResults, categoryName, categoryIndex)
+                        string formId = Search.GetResultFormID(item)
+                        Form theForm = FormHelper.HexToForm(formId)
+                        if theForm.GetType() == 42 ; AMMO
+                            ItemAndSpellStorage.AddItem(theForm, 50)
+                        else
+                            ItemAndSpellStorage.AddItem(theForm)
+                        endIf
+                        categoryIndex += 1
+                    endWhile
+                endIf
+                i += 1
+            endWhile
+            CurrentNotification = ""
+            ItemAndSpellStorage.OpenInventory(abForceOpen = true)
+            
+        elseIf categoryNameWithCount == "[View All Spells]"
+            Debug.MessageBox("TODO")
+
+        else
+            int categoryIndex = JArray.findStr(categoriesWithCounts, categoryNameWithCount)
+            string category = categoryNames[categoryIndex]
+            ShowCategory(searchResults, category)
+        endIf
     endIf
 endFunction
 
@@ -437,7 +487,6 @@ function ShowCategory_Armor(int searchResults)
 endFunction
 
 function ShowCategory_Weapon(int searchResults)
-    
 endFunction
 
 function ShowCategory_Actors(int searchResults)

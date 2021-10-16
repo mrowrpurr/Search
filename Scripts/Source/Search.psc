@@ -23,6 +23,8 @@ string function Help(string query) global
             consoleOpen = true
         endIf
 
+        UI.InvokeInt("Console", "_global.Console.SetHistoryCharBufferSize", 100000)
+
         UI.SetFloat("Console", "_global.Console.ConsoleInstance._SearchInitialized", 69) ; Set as initialized
         
         if consoleOpen && consoleUtilInstalled
