@@ -388,8 +388,22 @@ function ShowCategory(int searchResults, string category)
         endIf
 
     else        
-        Debug.Notification("Category not yet supported: " + category)
-        ShowSearchResultChooser(searchResults, category, "~ Not Yet Supported ~", showName = true, showEditorId = true, showFormId = true)
+        int selection = ShowSearchResultChooser(searchResults, category, "~ " + GetCategoryDisplayName(category) + " ~", showName = true, showEditorId = true, showFormId = true)
+        if selection > -1
+            int    result   = Search.GetNthResultInCategory(searchResults, category, selection)
+            string formId   = Search.GetResultFormID(result)
+            string editorId = Search.GetResultEditorID(result)
+            string name     = Search.GetResultName(result)
+            string text     = "[Item Info]\n\n"
+            if editorId
+                text += editorId + "\n\n"
+            endIf
+            text += "(" + formId + ")\n\n"
+            if name
+                text += name
+            endIf
+            Debug.MessageBox(text)
+        endIf
     endIf
 endFunction
 
@@ -412,6 +426,10 @@ function ShowCategory_Quest(int searchResults)
 
         int listOptions = JArray.object()
         JArray.addStr(listOptions, "[" + editorId + "]")
+        if theQuest.IsCompleted()
+            JArray.addStr(listOptions, "[ Completed ]")
+        endIf
+        JArray.addStr(listOptions, "[ Current Stage: " + theQuest.GetCurrentStageID() + " ]")
         JArray.addStr(listOptions, "Start Quest")
         JArray.addStr(listOptions, "Stop Quest")
         JArray.addStr(listOptions, "Reset Quest")
@@ -419,6 +437,7 @@ function ShowCategory_Quest(int searchResults)
         JArray.addStr(listOptions, "Set Objective Displayed")
         JArray.addStr(listOptions, "Set Objective Completed")
         JArray.addStr(listOptions, "Set Objective Failed")
+        JArray.addStr(listOptions, "Move To Next Quest Objective Location")
 
         string questAction = GetUserSelection(JArray.asStringArray(listOptions))
 
@@ -436,6 +455,8 @@ function ShowCategory_Quest(int searchResults)
             theQuest.SetObjectiveCompleted(GetUserInput() as int)
         elseIf questAction == "Set Objective Failed"
             theQuest.SetObjectiveFailed(GetUserInput() as int)
+        elseIf questAction == "Move To Next Quest Objective Location"
+            ConsoleUtil.ExecuteCommand("movetoqt " + editorId)
         endIf
     endIf
 endFunction
