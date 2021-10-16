@@ -202,7 +202,7 @@ endFunction
 bool function CategoryIsInventoryType(string category)
     return category == "ALCH" || category == "INGR" || category == "KEYM" || \
            category == "WEAP" || category == "ARMO" || category == "AMMO" || \
-           category == "SCRL" || category == "BOOK"
+           category == "SCRL" || category == "BOOK" || category == "MISC"
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -359,6 +359,9 @@ function ShowCategory(int searchResults, string category)
 
     elseIf category == "IMAD"
         ShowCategory_ImageSpaceModifier(searchResults)
+
+    elseIf category == "MESG"
+        ShowCategory_Message(searchResults)
 
     elseIf category == "LCRT"
         Debug.MessageBox("Markers aren't yet really useful, we'll make it so you can move them, move TO them, and SEE them by changing the .ini settings")
@@ -612,6 +615,17 @@ function ShowCategory_ImageSpaceModifier(int searchResults)
         ImageSpaceModifier theImad = FormHelper.HexToForm(formId) as ImageSpaceModifier
         theImad.Apply(1.0)
         Debug.MessageBox("Applied " + editorId)
+    endIf
+endFunction
+
+function ShowCategory_Message(int searchResults)
+    int selection = ShowSearchResultChooser(searchResults, "MESG", "~ Choose Message to Show ~", showName = true, showEditorId = true, showFormId = true)
+    if selection > -1
+        int result = Search.GetNthResultInCategory(searchResults, "MESG", selection)
+        string editorId = Search.GetResultEditorID(result)
+        string formId = Search.GetResultFormID(result)
+        Message theMessage = FormHelper.HexToForm(formId) as Message
+        theMessage.Show()
     endIf
 endFunction
 
