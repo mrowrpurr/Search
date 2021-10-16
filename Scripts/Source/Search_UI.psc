@@ -56,7 +56,8 @@ endFunction
 string property ConfigPath_Root              = ".search.config"                    autoReadonly
 string property ConfigPath_KeyboardShortcuts = ".search.config.keyboard_shortcuts" autoReadonly
 string property ConfigPath_Category_Names    = ".search.config.category_names"     autoReadonly
-string property ConfigurationFilePath        = "Data/Search/Config.json"                autoReadonly
+string property ConfigPath_Weapon_Types      = ".search.config.weapon_types"       autoReadonly
+string property ConfigurationFilePath        = "Data/Search/Config.json"           autoReadonly
 
 function LoadConfiguration()
     int configFromFile = JValue.readFromFile(ConfigurationFilePath)
@@ -65,6 +66,7 @@ function LoadConfiguration()
     else
         JDB.solveObjSetter(ConfigPath_KeyboardShortcuts, JMap.object(), createMissingKeys = true)
         JDB.solveObjSetter(ConfigPath_Category_Names,    JMap.object(), createMissingKeys = true)
+        JDB.solveObjSetter(ConfigPath_Weapon_Types,      JMap.object(), createMissingKeys = true)
     endIf
 endFunction
 
@@ -484,6 +486,106 @@ function ShowCategory_Armor(int searchResults)
 endFunction
 
 function ShowCategory_Weapon(int searchResults)
+    int selection = ShowSearchResultChooser(searchResults, "WEAP", "~ View Weapon ~", showName = true, showEditorId = true, showFormId = true, option1 = "[View All Items]")
+    if selection > -1
+        int result = Search.GetNthResultInCategory(searchResults, "WEAP", selection)
+        string editorId = Search.GetResultEditorID(result)
+        string formId = Search.GetResultFormID(result)
+        Weapon theWeapon = FormHelper.HexToForm(formId) as Weapon
+
+        int listOptions = JArray.object()
+        JArray.addStr(listOptions, "[" + theWeapon.GetName() + "]")
+        JArray.addStr(listOptions, "Edit Base Damage")
+        JArray.addStr(listOptions, "Edit Critical Damage")
+        JArray.addStr(listOptions, "Edit Weapon Type")
+        JArray.addStr(listOptions, "Edit Weapon Skill")
+        JArray.addStr(listOptions, "Edit ...")
+        ; Equip Type?
+        JArray.addStr(listOptions, "Set Enchantment")
+        if theWeapon.GetEnchantment()
+            JArray.addStr(listOptions, "Set Enchantment Magnitude")
+        endIf
+
+        string weaponAction = GetUserSelection(JArray.asStringArray(listOptions))
+
+        if weaponAction == "Edit Base Damage"
+            int originalBaseDamage = theWeapon.GetBaseDamage()
+            int newBaseDamage = GetUserInput(originalBaseDamage) as int
+            theWeapon.SetBaseDamage(newBaseDamage)
+            Debug.MessageBox("Changed " + theWeapon.GetName() + " base damage from " + originalBaseDamage + " to " + newBaseDamage)
+
+        elseIf weaponAction == "Edit Critical Damage"
+
+
+        elseIf weaponAction == "Edit Weapon Type"
+            int originalType = theWeapon.GetWeaponType()
+
+
+        elseIf weaponAction == "Edit Weapon Skill"
+
+
+        elseIf weaponAction == "Set Enchantment"
+
+
+        elseIf weaponAction == "Set Enchantment Magnitude"
+
+        endIf
+    endIf
+
+
+    ;     if armorAction == "Edit Armor Rating"
+    ;         int armorRating = GetUserInput(theArmor.GetArmorRating()) as int
+    ;         theArmor.SetArmorRating(armorRating)
+    ;         Debug.MessageBox("Set the armor rating of " + theArmor.GetName() + "  to " + armorRating)
+    ;     elseIf armorAction == "Edit Armor Type"
+
+    ;     elseIf armorAction == "Set Enchantment"
+    ;         Enchantment theEnchantmentOnArmor
+    ;         while ! theEnchantmentOnArmor
+    ;             int enchantmentResult = ChooseEnchantment()
+    ;             string enchantmentFormId = Search.GetResultFormID(enchantmentResult)
+    ;             Enchantment theEnchantment = FormHelper.HexToForm(enchantmentFormId) as Enchantment
+    ;             if theEnchantment
+    ;                 theArmor.SetEnchantment(theEnchantment)
+    ;                 theEnchantmentOnArmor = theArmor.GetEnchantment()
+    ;                 if theEnchantmentOnArmor
+    ;                     if theEnchantmentOnArmor == theEnchantment
+    ;                         Debug.MessageBox("Applied enchantment " + theEnchantment.GetName() + " to " + theArmor.GetName())
+    ;                     else
+    ;                         theEnchantmentOnArmor = None
+    ;                     endIf
+    ;                 endIf
+    ;             endIf
+    ;         endWhile
+
+    ;     elseIf armorAction == "Set Enchantment Magnitude"
+    ;         Enchantment theEnchantment = theArmor.GetEnchantment()
+    ;         int effectIndex = ChooseNthEnchantmentMagicEffect(theEnchantment)
+    ;         float originalMagnitude = theEnchantment.GetNthEffectMagnitude(effectIndex)
+    ;         float magnitude = GetUserInput(originalMagnitude) as float
+    ;         theEnchantment.SetNthEffectMagnitude(effectIndex, magnitude) 
+    ;         MagicEffect theEffect = theEnchantment.GetNthEffectMagicEffect(effectIndex)
+    ;         Debug.MessageBox("Changed magnitude of " + theEffect.GetName() + " from " + originalMagnitude + " to " + magnitude)
+
+    ;     elseIf armorAction == "Set Slot Mask"
+
+    ;     endIf
+
+    ; elseIf selection == -2
+    ;     ; View All Items
+    ;     ItemAndSpellStorage.RemoveAllItems()
+    ;     int count = Search.GetResultCategoryCount(searchResults, "ARMO")
+    ;     int i = 0
+    ;     while i < count
+    ;         int item = Search.GetNthResultInCategory(searchResults, "ARMO", i)
+    ;         string formId = Search.GetResultFormID(item)
+    ;         Form theForm = FormHelper.HexToForm(formId)
+    ;         ItemAndSpellStorage.AddItem(theForm)
+    ;         i += 1
+    ;     endWhile
+    ;     ItemAndSpellStorage.GetActorBase().SetName("Items")
+    ;     ItemAndSpellStorage.OpenInventory(abForceOpen = true)
+    ; endIf
 endFunction
 
 function ShowCategory_Actors(int searchResults)
@@ -583,6 +685,33 @@ function ShowCategory_WordOfPower(int searchResults)
         Game.TeachWord(theWord)
         Debug.MessageBox("Player has now learned the word " + theWord.GetName())
     endIf
+endFunction
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Weapon Types
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+int property WeaponTypesMap
+    int function get()
+        return JDB.solveObj(ConfigPath_Weapon_Types)
+    endFunction
+endProperty
+
+string function GetWeaponTypeName(int weaponType)
+    string[] weaponTypeNames = JMap.allKeysPArray(WeaponTypesMap)
+    int i = 0
+    while i < weaponTypeNames.Length
+        string name = weaponTypeNames[i]
+        int value = JMap.getInt(WeaponTypesMap, name)
+        if value == weaponType
+            return name
+        endIf
+        i += 1
+    endWhile
+endFunction
+
+int function GetWeaponIdFromName(string name)
+    return JMap.getInt(WeaponTypesMap, name)
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -774,16 +903,16 @@ endFunction
 ; Object Placement Spell
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-Form property ObjectToPlace auto
+Form property  ObjectToPlace          auto
 Spell property Search_Placement_Spell auto
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Item and Spell Storage
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-Actor property ItemAndSpellStorage auto
-Actor property FakePlayerForSpellUI auto
-UIMagicMenu property MagicMenu auto
+Actor       property ItemAndSpellStorage  auto
+Actor       property FakePlayerForSpellUI auto
+UIMagicMenu property MagicMenu            auto
 
 function RemoveAllSpells(actor theActor)
     int count = theActor.GetSpellCount()

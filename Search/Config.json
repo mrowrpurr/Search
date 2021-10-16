@@ -30,5 +30,18 @@
         "SPEL": "Spell",
         "WOOP": "Word of Power",
         "MESG": "Message"
+    },
+    "weapon_types": {
+        "Fist": 0,
+        "Sword": 1,
+        "Dagger": 2,
+        "War Axe": 3,
+        "Mace": 4,
+        "Greatsword": 5,
+        "Battleaxe": 6,
+        "Warhammer": 6,
+        "Bow": 7,
+        "Staff": 8,
+        "Crossbow": 9
     }
 }
