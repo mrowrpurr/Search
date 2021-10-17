@@ -32,7 +32,8 @@
         "MESG": "Message",
         "ALCH": "Food & Potions",
         "ACTI": "Activators",
-        "IMAD": "Image Space Modifier"
+        "IMAD": "Image Space Modifier",
+        "SLGM": "Soul Gem"
     },
     "weapon_types": {
         "Fist": 0,

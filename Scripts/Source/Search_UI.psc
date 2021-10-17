@@ -202,7 +202,8 @@ endFunction
 bool function CategoryIsInventoryType(string category)
     return category == "ALCH" || category == "INGR" || category == "KEYM" || \
            category == "WEAP" || category == "ARMO" || category == "AMMO" || \
-           category == "SCRL" || category == "BOOK" || category == "MISC"
+           category == "SCRL" || category == "BOOK" || category == "MISC" || \
+           category == "SLGM"
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -297,7 +298,7 @@ function ShowSearchCategorySelection(string query, int searchResults)
                         int item = Search.GetNthResultInCategory(searchResults, categoryName, categoryIndex)
                         string formId = Search.GetResultFormID(item)
                         Form theForm = FormHelper.HexToForm(formId)
-                        if theForm.GetType() == 42 ; AMMO
+                        if theForm.GetType() == 42 || theForm.GetType() == 52 ; AMMO or SLGM
                             AddToInventoryView(theForm, 50)
                         else
                             AddToInventoryView(theForm)
@@ -369,6 +370,9 @@ function ShowCategory(int searchResults, string category)
     elseIf category == "MESG"
         ShowCategory_Message(searchResults)
 
+    ; elseIf category == "SLGM"
+    ;     ShowCategory_SoulGem(searchResults)
+
     elseIf category == "LCRT"
         Debug.MessageBox("Markers aren't yet really useful, we'll make it so you can move them, move TO them, and SEE them by changing the .ini settings")
         ShowCategory_Marker(searchResults)
@@ -384,7 +388,7 @@ function ShowCategory(int searchResults, string category)
             string formId = Search.GetResultFormID(result)
             Form theItem = FormHelper.HexToForm(formId) as Form
             int count = 1
-            if theItem.GetType() == 42 ; AMMO
+            if theItem.GetType() == 42 || theItem.GetType() == 52 ; AMMO or SLGM
                 count = 50
             endIf
             count = GetUserInput(count) as int
@@ -532,7 +536,7 @@ function ShowCategory_Armor(int searchResults)
 endFunction
 
 function ShowCategory_Weapon(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "WEAP", "~ View Weapon ~", showName = true, showEditorId = true, showFormId = true, option1 = "[View All Items]")
+    int selection = ShowSearchResultChooser(searchResults, "WEAP", "~ View Weapon ~", showName = true, showEditorId = false, showFormId = false, option1 = "[View All Items]")
     if selection > -1
         int result = Search.GetNthResultInCategory(searchResults, "WEAP", selection)
         string editorId = Search.GetResultEditorID(result)
@@ -541,6 +545,7 @@ function ShowCategory_Weapon(int searchResults)
 
         int listOptions = JArray.object()
         JArray.addStr(listOptions, "[" + theWeapon.GetName() + "]")
+        JArray.addStr(listOptions, "Add to Inventory")
         JArray.addStr(listOptions, "Edit Base Damage")
         JArray.addStr(listOptions, "Edit Critical Damage")
         JArray.addStr(listOptions, "Edit Weapon Type")
@@ -553,7 +558,14 @@ function ShowCategory_Weapon(int searchResults)
 
         string weaponAction = GetUserSelection(JArray.asStringArray(listOptions))
 
-        if weaponAction == "Edit Base Damage"
+        if weaponAction == "Add to Inventory"
+            int count = GetUserInput(1) as int
+            if ! count
+                count = 1
+            endIf
+            PlayerRef.AddItem(theWeapon, count)
+
+        elseIf weaponAction == "Edit Base Damage"
             int originalBaseDamage = theWeapon.GetBaseDamage()
             int newBaseDamage = GetUserInput(originalBaseDamage) as int
             theWeapon.SetBaseDamage(newBaseDamage)
@@ -572,8 +584,33 @@ function ShowCategory_Weapon(int searchResults)
             endIf
 
         elseIf weaponAction == "Set Enchantment"
+            Enchantment theEnchantmentOnArmor
+            while ! theEnchantmentOnArmor
+                int enchantmentResult = ChooseEnchantment()
+                string enchantmentFormId = Search.GetResultFormID(enchantmentResult)
+                Enchantment theEnchantment = FormHelper.HexToForm(enchantmentFormId) as Enchantment
+                if theEnchantment
+                    theWeapon.SetEnchantment(theEnchantment)
+                    theEnchantmentOnArmor = theWeapon.GetEnchantment()
+                    if theEnchantmentOnArmor
+                        theWeapon.SetEnchantmentValue(10000)
+                        if theEnchantmentOnArmor == theEnchantment
+                            Debug.MessageBox("Applied enchantment " + theEnchantment.GetName() + " to " + theWeapon.GetName())
+                        else
+                            theEnchantmentOnArmor = None
+                        endIf
+                    endIf
+                endIf
+            endWhile
             
         elseIf weaponAction == "Set Enchantment Magnitude"
+            Enchantment theEnchantment = theWeapon.GetEnchantment()
+            int effectIndex = ChooseNthEnchantmentMagicEffect(theEnchantment)
+            float originalMagnitude = theEnchantment.GetNthEffectMagnitude(effectIndex)
+            float magnitude = GetUserInput(originalMagnitude) as float
+            theEnchantment.SetNthEffectMagnitude(effectIndex, magnitude) 
+            MagicEffect theEffect = theEnchantment.GetNthEffectMagicEffect(effectIndex)
+            Debug.MessageBox("Changed magnitude of " + theEffect.GetName() + " from " + originalMagnitude + " to " + magnitude)
 
         endIf
     endIf
@@ -726,31 +763,6 @@ function ShowCategory_Idle(int searchResults)
         else
             PlayerRef.PlayIdle(theIdle)
         endIf
-
-
-        ; if weaponAction == "Edit Base Damage"
-        ;     int originalBaseDamage = theWeapon.GetBaseDamage()
-        ;     int newBaseDamage = GetUserInput(originalBaseDamage) as int
-        ;     theWeapon.SetBaseDamage(newBaseDamage)
-        ;     Debug.MessageBox("Changed " + theWeapon.GetName() + " base damage from " + originalBaseDamage + " to " + newBaseDamage)
-
-        ; elseIf weaponAction == "Edit Critical Damage"
-        ;     ; TODO
-
-        ; elseIf weaponAction == "Edit Weapon Type"
-        ;     string originalTypeName = GetWeaponTypeName(theWeapon.GetWeaponType())
-        ;     string newTypeName = GetUserSelection(JMap.allKeysPArray(WeaponTypesMap))
-        ;     if newTypeName
-        ;         int newTypeId = GetWeaponIdFromName(newTypeName)
-        ;         theWeapon.SetWeaponType(newTypeId)
-        ;         Debug.MessageBox("Changed " + theWeapon.GetName() + " type from " + originalTypeName + " to " + newTypeName)
-        ;     endIf
-
-        ; elseIf weaponAction == "Set Enchantment"
-            
-        ; elseIf weaponAction == "Set Enchantment Magnitude"
-
-        ; endIf
     endIf
 endFunction
 
@@ -770,6 +782,17 @@ function ShowCategory_Dialogue(int searchResults)
             Debug.MessageBox("say " + editorId)
             ConsoleUtil.ExecuteCommand("say " + editorId)
         endIf
+    endIf
+endFunction
+
+; TODO
+function ShowCategory_SoulGem(int searchResults)
+    int selection = ShowSearchResultChooser(searchResults, "SLGM", "~ Choose Soul Gem ~", showName = false, showEditorId = true, showFormId = true)
+    if selection > -1
+        int result = Search.GetNthResultInCategory(searchResults, "SLGM", selection)
+        string editorId = Search.GetResultEditorID(result)
+        string formId = Search.GetResultFormID(result)
+        Idle theIdle = FormHelper.HexToForm(formId) as Idle
     endIf
 endFunction
 
@@ -889,6 +912,7 @@ int function ShowSearchResultChooser(int searchResults, string category, string 
         if showFormId
             text += prefix + "(" + formId + ")"
         endIf
+
         if ! filter || StringUtil.Find(name + editorId + formId, filter) > -1
             if ! pluginFilter || FormHelper.HexToModName(formId) == pluginFilter
                 JArray.addStr(optionsToShow, text)
@@ -1060,7 +1084,11 @@ function ShowInventoryViewForCategory(int searchResults, string category)
         int item = Search.GetNthResultInCategory(searchResults, category, i)
         string formId = Search.GetResultFormID(item)
         Form theForm = FormHelper.HexToForm(formId)
-        AddToInventoryView(theForm)
+        if theForm.GetType() == 42 || theForm.GetType() == 52 ; AMMO or SLGM
+            AddToInventoryView(theForm, 50)
+        else
+            AddToInventoryView(theForm)
+        endIf
         i += 1
     endWhile
     ShowInventoryView()
@@ -1071,7 +1099,7 @@ function ResetInventoryView()
 endFunction
 
 function AddToInventoryView(Form theForm, int count = 1)
-    ItemAndSpellStorage.AddItem(theForm)
+    ItemAndSpellStorage.AddItem(theForm, count)
 endFunction
 
 function ShowInventoryView()
