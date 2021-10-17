@@ -549,9 +549,8 @@ function ShowCategory_Weapon(int searchResults)
         JArray.addStr(listOptions, "Edit Base Damage")
         JArray.addStr(listOptions, "Edit Critical Damage")
         JArray.addStr(listOptions, "Edit Weapon Type")
-        JArray.addStr(listOptions, "Edit ...")
-        ; Equip Type?
-        JArray.addStr(listOptions, "Set Enchantment")
+        JArray.addStr(listOptions, "Enchantment Item")
+        JArray.addStr(listOptions, "Enchantment All Items")
         if theWeapon.GetEnchantment()
             JArray.addStr(listOptions, "Set Enchantment Magnitude")
         endIf
@@ -583,21 +582,36 @@ function ShowCategory_Weapon(int searchResults)
                 Debug.MessageBox("Changed " + theWeapon.GetName() + " type from " + originalTypeName + " to " + newTypeName)
             endIf
 
-        elseIf weaponAction == "Set Enchantment"
-            Enchantment theEnchantmentOnArmor
-            while ! theEnchantmentOnArmor
+        elseIf weaponAction == "Enchantment Item"
+            Enchantment theEnchantmentOnWeapon
+            ; while ! theEnchantmentOnWeapon
+                int enchantmentResult = ChooseEnchantment()
+                string enchantmentFormId = Search.GetResultFormID(enchantmentResult)
+                Enchantment theEnchantment = FormHelper.HexToForm(enchantmentFormId) as Enchantment
+                if theEnchantment
+                    PlayerRef.AddItem(theWeapon)
+                    PlayerRef.EquipItemEx(theWeapon, equipSlot = 1)
+                    EnchantItem(theEnchantment, 0, 1)
+                    Debug.MessageBox("Enchanted " + theWeapon.GetName() + " with " + theEnchantment.GetName())
+                    ; theEnchantmentOnWeapon = 
+                endIf
+            ; endWhile
+
+        elseIf weaponAction == "Enchantment All Items"
+            Enchantment theEnchantmentOnWeapon
+            while ! theEnchantmentOnWeapon
                 int enchantmentResult = ChooseEnchantment()
                 string enchantmentFormId = Search.GetResultFormID(enchantmentResult)
                 Enchantment theEnchantment = FormHelper.HexToForm(enchantmentFormId) as Enchantment
                 if theEnchantment
                     theWeapon.SetEnchantment(theEnchantment)
-                    theEnchantmentOnArmor = theWeapon.GetEnchantment()
-                    if theEnchantmentOnArmor
+                    theEnchantmentOnWeapon = theWeapon.GetEnchantment()
+                    if theEnchantmentOnWeapon
                         theWeapon.SetEnchantmentValue(10000)
-                        if theEnchantmentOnArmor == theEnchantment
+                        if theEnchantmentOnWeapon == theEnchantment
                             Debug.MessageBox("Applied enchantment " + theEnchantment.GetName() + " to " + theWeapon.GetName())
                         else
-                            theEnchantmentOnArmor = None
+                            theEnchantmentOnWeapon = None
                         endIf
                     endIf
                 endIf
@@ -614,6 +628,40 @@ function ShowCategory_Weapon(int searchResults)
 
         endIf
     endIf
+endFunction
+
+; TODO support up to 10+ magic effects
+function EnchantItem(Enchantment theEnchanment, int slotMask, int handSlot = 0)
+    MagicEffect[] effects    = new MagicEffect[1]
+    float[]       magnitudes = new float[1]
+    int[]         areas      = new int[1]
+    int[]         durations  = new int[1]
+
+    effects[0]    = theEnchanment.GetNthEffectMagicEffect(0)
+    magnitudes[0] = theEnchanment.GetNthEffectMagnitude(0)
+    areas[0]      = theEnchanment.GetNthEffectArea(0)
+    durations[0] = theEnchanment.GetNthEffectDuration(0)
+
+    float maxCharge = 1000.0 ; ?
+
+    WornObject.CreateEnchantment( \
+        PlayerRef, \
+        handSlot, \
+        slotMask, \
+        maxCharge, \
+        effects, \
+        magnitudes, \
+        areas, \
+        durations)
+
+    ; ; int i = 0
+    ; ; while i < 200
+    ; ;     Armor theArmor = player.GetEquippedArmorInSlot(i)
+    ; ;     if theArmor
+    ; ;         Debug.MessageBox(theArmor.GetName() + " is equipped in slot " + i + " ---> " + theArmor.GetSlotMask())
+    ; ;     endIf
+    ; ;     i += 1
+    ; ; endWhile
 endFunction
 
 function ShowCategory_Actors(int searchResults)
