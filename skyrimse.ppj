@@ -6,12 +6,12 @@
     Output="Scripts" 
     Optimize="false" 
     Release="false" 
-    Zip="false"
+    Zip="true"
     Package="false"
     Final="false">
     <Variables>
         <!-- Set the name of your mod: -->
-        <Variable Name="ModName" Value="ConsoleSearch" />
+        <Variable Name="ModName" Value="Search" />
         <!-- The folder where you store all of your mods -->
         <Variable Name="ModsFolder" Value="C:\Users\mrowr\Dropbox\Skyrim\Mods" />
         <!-- Optional folder with additional source code for imports -->
