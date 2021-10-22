@@ -20,8 +20,10 @@
     <Imports>
         <!-- Core Dependencies -->
         <Import>@ImportsFolder\SKSE64\Scripts\Source</Import>
-        <Import>@ModsFolder\FormHelper\Scripts\Source</Import>
+        <Import>@ModsFolder\Form Helper\Scripts\Source</Import>
         <Import>@ImportsFolder\JContainers\Scripts\Source</Import>
+
+        <!-- Optional -->
         <Import>@ImportsFolder\ConsoleUtil\Scripts\Source</Import>
 
         <!-- UI Dependencies -->

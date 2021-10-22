@@ -253,12 +253,33 @@ endProperty
 ; Search Category Selection
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+function SortCategoryNames(string[] categoryNames)
+    int index1
+    int index2 = categoryNames.Length - 1
+	while (index2 > 0)
+		index1 = 0
+		while (index1 < index2)
+			if (GetCategoryDisplayName(categoryNames[index1]) > GetCategoryDisplayName(categoryNames[index1 + 1]))
+				string swapDummy = categoryNames[index1]
+				categoryNames[index1] = categoryNames[index1 + 1]
+				categoryNames[index1 + 1] = swapDummy
+			endIf
+			index1 += 1
+		endWhile
+		index2 -= 1
+	endWhile
+endFunction
+
 function ShowSearchCategorySelection(string query, int searchResults)
     string[] categoryNames = Search.GetResultCategories(searchResults)
     if ! categoryNames
         Debug.MessageBox("No results found for '" + query + "'")
         return
     endIf
+
+    ; Bubble Sort
+    ; https://www.creationkit.com/index.php?title=User:Sclerocephalus#A_short_function_for_sorting_arrays
+    SortCategoryNames(categoryNames) 
 
     bool anyItemTypes = false
     int categoriesWithCounts = JArray.object()

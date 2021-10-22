@@ -33,7 +33,10 @@
         "ALCH": "Food & Potions",
         "ACTI": "Activators",
         "IMAD": "Image Space Modifier",
-        "SLGM": "Soul Gem"
+        "SLGM": "Soul Gem",
+        "CLAS": "Class",
+        "ANIO": "Animation Object",
+        "IDLE": "Idle Animation"
     },
     "weapon_types": {
         "Fist": 0,
