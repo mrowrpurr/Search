@@ -1,0 +1,1 @@
+Scriptname Search_UI_SkyrimSearchProvider extends ReferenceAlias  
