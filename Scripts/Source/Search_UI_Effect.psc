@@ -4,12 +4,22 @@ scriptname Search_UI_Effect extends ActiveMagicEffect
 Search_UI property API auto
 
 event OnEffectStart(Actor target, Actor caster)
-    Search.LoadConfig()
-    string[] searchProviders = Search.GetSearchProviderNames()
-    string providerName = Search_UI.GetUserSelection(searchProviders)
-    Debug.MessageBox("Provide your query to search for " + providerName)
-    string query = Search_UI.GetUserInput()
+    DisplayResults(Search.ExecuteQuery(Search_UI.GetUserInput()))
 endEvent
+
+function DisplayResults(int results)
+    string[] categoryNames = SearchResult.GetCategoryNames(results)
+    Debug.MessageBox(categoryNames)
+endFunction
+
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 event OnEffectStart_Original(Actor target, Actor caster)
     ; API.UnregisterForAllKeys()
