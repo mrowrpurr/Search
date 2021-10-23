@@ -1,0 +1,1 @@
+Scriptname Search_ConsoleSearchProvider extends ReferenceAlias  
