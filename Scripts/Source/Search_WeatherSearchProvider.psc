@@ -1,9 +1,9 @@
-scriptName Search_WeatherSearchProvider extends SearchProvider 
+scriptName Search_WeatherSearchProvider extends SearchProvider
 
 string WeatherDataFilePath = "Data/Search/Providers/Weather/Weathers.json"
 
 ; TODO ~ we can search on "Pine" and "Coast" and stuff
-event OnSearch(string query)
+int function PerformSearch(string query, int results)
     int weathers = JValue.readFromFile(WeatherDataFilePath)
     string[] formIds = JMap.allKeysPArray(weathers)
     int i = 0
@@ -11,11 +11,12 @@ event OnSearch(string query)
         string formId   = formIds[i] 
         string editorId = JMap.getStr(weathers, formId)
         if StringUtil.Find(editorId, query) > -1
-            AddSearchResult("Weather",   \
-                displayText = editorId,  \
-                formId      = formId     \
-            )
+            int result = JMap.object()
+            JMap.setStr(result, "formId", formId)
+            JMap.setStr(result, "editorId", editorId)
+            Search.AddSearchResult(results, "Weather", editorId, result)
         endIf
         i += 1
     endWhile
-endEvent
+    return results
+endFunction

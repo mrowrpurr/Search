@@ -40,12 +40,14 @@ int function GetSearchResultHistory() global
     return history
 endFunction
 
-int function ExecuteQuery(string query, string[] providerNames = None, float timeout = 30.0) global
+int function ExecuteQuery(string query, float timeout = 5.0) global
+    Debug.MessageBox("Execute Query " + query)
+
     ; Get all of the providers to search
-    if ! providerNames
-        EnsureConfig()
-        providerNames = GetSearchProviderNames()
-    endIf
+    EnsureConfig()
+    string[] providerNames = GetSearchProviderNames()
+
+    Debug.MessageBox("Provider Names: " + providerNames)
 
     ; Store the results from each searched provider
     int providerResults = JArray.object()
@@ -56,6 +58,7 @@ int function ExecuteQuery(string query, string[] providerNames = None, float tim
     ModEvent.PushString(searchEvent, query)
     ModEvent.PushInt(searchEvent, providerResults)
     ModEvent.Send(searchEvent)
+    Debug.MessageBox("Sent SearchQuery event")
 
     ; Wait for the search query responses...
     float searchStartTime = Utility.GetCurrentRealTime()
@@ -64,5 +67,29 @@ int function ExecuteQuery(string query, string[] providerNames = None, float tim
         Utility.WaitMenuMode(0.1)
     endWhile
 
+    JValue.writeToFile(providerResults, "ProviderResults.json")
+    Debug.MessageBox("Provider Results.json")
+
     return providerResults
+endFunction
+
+int function NewSearchResultSet(string provider) global
+    int result = JMap.object()
+    JMap.setStr(result, "provider", provider)
+    JMap.setObj(result, "results", JMap.object())
+    return result
+endFunction
+
+function AddSearchResult(int results, string category, string displayText, int data) global
+    int result = JMap.object()
+    JMap.setStr(result, "displayText", displayText)
+    JMap.setObj(result, "data", data)
+
+    if JMap.hasKey(results, category)
+        JArray.addObj(JMap.getObj(results, category), result)
+    else
+        int categoryArray = JArray.object()
+        JArray.addObj(categoryArray, result)
+        JMap.setObj(results, category, categoryArray)
+    endIf
 endFunction

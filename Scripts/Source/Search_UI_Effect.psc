@@ -4,19 +4,15 @@ scriptname Search_UI_Effect extends ActiveMagicEffect
 Search_UI property API auto
 
 event OnEffectStart(Actor target, Actor caster)
-    DisplayResults(Search.ExecuteQuery(Search_UI.GetUserInput()))
+    string query = Search_UI.GetUserInput()
+    int results = Search.ExecuteQuery(query)
+    DisplayResults(results)
 endEvent
 
 function DisplayResults(int results)
-    string[] categoryNames = SearchResult.GetCategoryNames(results)
-    Debug.MessageBox(categoryNames)
+    JValue.writeToFile(results, "SearchResults.json")
+    Debug.MessageBox("Wrote to SearchResults.json")
 endFunction
-
-
-
-
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
