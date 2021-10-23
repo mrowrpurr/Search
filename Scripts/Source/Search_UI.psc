@@ -7,7 +7,7 @@ Requires:
 - FormHelper
 - ConsoleUtil (optional)
 
-For the Papyrus Utility, see the `Search.psc` script.}
+For the Papyrus Utility, see the `ConsoleSearch.psc` script.}
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Mod Installation and Setup
@@ -53,10 +53,10 @@ endFunction
 ; Configuration
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-string property ConfigPath_Root              = ".search.config"                    autoReadonly
-string property ConfigPath_KeyboardShortcuts = ".search.config.keyboard_shortcuts" autoReadonly
-string property ConfigPath_Category_Names    = ".search.config.category_names"     autoReadonly
-string property ConfigPath_Weapon_Types      = ".search.config.weapon_types"       autoReadonly
+string property ConfigPath_Root              = ".ConsoleSearch.config"                    autoReadonly
+string property ConfigPath_KeyboardShortcuts = ".ConsoleSearch.config.keyboard_shortcuts" autoReadonly
+string property ConfigPath_Category_Names    = ".ConsoleSearch.config.category_names"     autoReadonly
+string property ConfigPath_Weapon_Types      = ".ConsoleSearch.config.weapon_types"       autoReadonly
 string property ConfigurationFilePath        = "Data/Search/Config.json"           autoReadonly
 
 function LoadConfiguration()
@@ -210,16 +210,16 @@ endFunction
 ; Open Main Search UI prompt
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-string property SearchResultsPath_Root = ".search.results" autoReadonly
+string property SearchResultsPath_Root = ".ConsoleSearch.results" autoReadonly
 
 function OpenSearchPrompt()
     string query = GetUserInput()
     if query
         CurrentNotification = "Searching..."
         RegisterForSingleUpdate(0.0)
-        int searchResults = Search.ExecuteSearch(query)
+        int searchResults = ConsoleSearch.ExecuteSearch(query)
         SaveSearchResult(searchResults)
-        Search.SaveResultToFile(searchResults, "_SearchResults_.json")
+        ConsoleSearch.SaveResultToFile(searchResults, "_SearchResults_.json")
         CurrentNotification = ""
         if ! searchResults
             Debug.MessageBox("Search for '" + query + "' failed")
@@ -271,7 +271,7 @@ function SortCategoryNames(string[] categoryNames)
 endFunction
 
 function ShowSearchCategorySelection(string query, int searchResults)
-    string[] categoryNames = Search.GetResultCategories(searchResults)
+    string[] categoryNames = ConsoleSearch.GetResultCategories(searchResults)
     if ! categoryNames
         Debug.MessageBox("No results found for '" + query + "'")
         return
@@ -291,7 +291,7 @@ function ShowSearchCategorySelection(string query, int searchResults)
             anyItemTypes = true
         endIf
         string displayName = GetCategoryDisplayName(categoryName)
-        int count = Search.GetResultCategoryCount(searchResults, categoryName)
+        int count = ConsoleSearch.GetResultCategoryCount(searchResults, categoryName)
         JArray.addStr(categoriesWithCounts, displayName + " (" + count + ")")
         i += 1
     endWhile
@@ -313,11 +313,11 @@ function ShowSearchCategorySelection(string query, int searchResults)
             while i < categoryNames.Length
                 string categoryName = categoryNames[i]
                 if CategoryIsInventoryType(categoryName)
-                    int categoryCount = Search.GetResultCategoryCount(searchResults, categoryName)
+                    int categoryCount = ConsoleSearch.GetResultCategoryCount(searchResults, categoryName)
                     int categoryIndex = 0
                     while categoryIndex < categoryCount
-                        int item = Search.GetNthResultInCategory(searchResults, categoryName, categoryIndex)
-                        string formId = Search.GetResultFormID(item)
+                        int item = ConsoleSearch.GetNthResultInCategory(searchResults, categoryName, categoryIndex)
+                        string formId = ConsoleSearch.GetResultFormID(item)
                         Form theForm = FormHelper.HexToForm(formId)
                         if theForm.GetType() == 42 || theForm.GetType() == 52 ; AMMO or SLGM
                             AddToInventoryView(theForm, 50)
@@ -404,9 +404,9 @@ function ShowCategory(int searchResults, string category)
             ShowInventoryViewForCategory(searchResults, category)
 
         elseIf selection > -1
-            int result = Search.GetNthResultInCategory(searchResults, category, selection)
-            string editorId = Search.GetResultEditorID(result)
-            string formId = Search.GetResultFormID(result)
+            int result = ConsoleSearch.GetNthResultInCategory(searchResults, category, selection)
+            string editorId = ConsoleSearch.GetResultEditorID(result)
+            string formId = ConsoleSearch.GetResultFormID(result)
             Form theItem = FormHelper.HexToForm(formId) as Form
             int count = 1
             if theItem.GetType() == 42 || theItem.GetType() == 52 ; AMMO or SLGM
@@ -421,10 +421,10 @@ function ShowCategory(int searchResults, string category)
     else        
         int selection = ShowSearchResultChooser(searchResults, category, "~ " + GetCategoryDisplayName(category) + " ~", showName = true, showEditorId = true, showFormId = true)
         if selection > -1
-            int    result   = Search.GetNthResultInCategory(searchResults, category, selection)
-            string formId   = Search.GetResultFormID(result)
-            string editorId = Search.GetResultEditorID(result)
-            string name     = Search.GetResultName(result)
+            int    result   = ConsoleSearch.GetNthResultInCategory(searchResults, category, selection)
+            string formId   = ConsoleSearch.GetResultFormID(result)
+            string editorId = ConsoleSearch.GetResultEditorID(result)
+            string name     = ConsoleSearch.GetResultName(result)
             string text     = "[Item Info]\n\n"
             if editorId
                 text += editorId + "\n\n"
@@ -441,8 +441,8 @@ endFunction
 function ShowCategory_Cell(int searchResults)
     int selection = ShowSearchResultChooser(searchResults, "CELL", "~ Choose Cell to Teleport ~", showName = false, showEditorId = true, showFormId = false)
     if selection >= 0
-        int result = Search.GetNthResultInCategory(searchResults, "CELL", selection)
-        string editorId = Search.GetResultEditorID(result)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "CELL", selection)
+        string editorId = ConsoleSearch.GetResultEditorID(result)
         Debug.CenterOnCell(editorId)
     endIf
 endFunction
@@ -450,9 +450,9 @@ endFunction
 function ShowCategory_Quest(int searchResults)
     int selection = ShowSearchResultChooser(searchResults, "QUST", "~ Choose Quest ~", showName = true, showEditorId = true, showFormId = true)
     if selection > -1
-        int result = Search.GetNthResultInCategory(searchResults, "QUST", selection)
-        string editorId = Search.GetResultEditorID(result)
-        string formId = Search.GetResultFormID(result)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "QUST", selection)
+        string editorId = ConsoleSearch.GetResultEditorID(result)
+        string formId = ConsoleSearch.GetResultFormID(result)
         Quest theQuest = FormHelper.HexToForm(formId) as Quest
 
         int listOptions = JArray.object()
@@ -495,9 +495,9 @@ endFunction
 function ShowCategory_Armor(int searchResults)
     int selection = ShowSearchResultChooser(searchResults, "ARMO", "~ View Armor ~", showName = true, showEditorId = true, showFormId = true, option1 = "[View All Items]")
     if selection > -1
-        int result = Search.GetNthResultInCategory(searchResults, "ARMO", selection)
-        string editorId = Search.GetResultEditorID(result)
-        string formId = Search.GetResultFormID(result)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "ARMO", selection)
+        string editorId = ConsoleSearch.GetResultEditorID(result)
+        string formId = ConsoleSearch.GetResultFormID(result)
         Armor theArmor = FormHelper.HexToForm(formId) as Armor
 
         int listOptions = JArray.object()
@@ -522,7 +522,7 @@ function ShowCategory_Armor(int searchResults)
             Enchantment theEnchantmentOnArmor
             while ! theEnchantmentOnArmor
                 int enchantmentResult = ChooseEnchantment()
-                string enchantmentFormId = Search.GetResultFormID(enchantmentResult)
+                string enchantmentFormId = ConsoleSearch.GetResultFormID(enchantmentResult)
                 Enchantment theEnchantment = FormHelper.HexToForm(enchantmentFormId) as Enchantment
                 if theEnchantment
                     theArmor.SetEnchantment(theEnchantment)
@@ -559,9 +559,9 @@ endFunction
 function ShowCategory_Weapon(int searchResults)
     int selection = ShowSearchResultChooser(searchResults, "WEAP", "~ View Weapon ~", showName = true, showEditorId = false, showFormId = false, option1 = "[View All Items]")
     if selection > -1
-        int result = Search.GetNthResultInCategory(searchResults, "WEAP", selection)
-        string editorId = Search.GetResultEditorID(result)
-        string formId = Search.GetResultFormID(result)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "WEAP", selection)
+        string editorId = ConsoleSearch.GetResultEditorID(result)
+        string formId = ConsoleSearch.GetResultFormID(result)
         Weapon theWeapon = FormHelper.HexToForm(formId) as Weapon
 
         int listOptions = JArray.object()
@@ -607,7 +607,7 @@ function ShowCategory_Weapon(int searchResults)
             Enchantment theEnchantmentOnWeapon
             ; while ! theEnchantmentOnWeapon
                 int enchantmentResult = ChooseEnchantment()
-                string enchantmentFormId = Search.GetResultFormID(enchantmentResult)
+                string enchantmentFormId = ConsoleSearch.GetResultFormID(enchantmentResult)
                 Enchantment theEnchantment = FormHelper.HexToForm(enchantmentFormId) as Enchantment
                 if theEnchantment
                     PlayerRef.AddItem(theWeapon)
@@ -622,7 +622,7 @@ function ShowCategory_Weapon(int searchResults)
             Enchantment theEnchantmentOnWeapon
             while ! theEnchantmentOnWeapon
                 int enchantmentResult = ChooseEnchantment()
-                string enchantmentFormId = Search.GetResultFormID(enchantmentResult)
+                string enchantmentFormId = ConsoleSearch.GetResultFormID(enchantmentResult)
                 Enchantment theEnchantment = FormHelper.HexToForm(enchantmentFormId) as Enchantment
                 if theEnchantment
                     theWeapon.SetEnchantment(theEnchantment)
@@ -688,12 +688,12 @@ endFunction
 function ShowCategory_Actors(int searchResults)
     int selection = ShowSearchResultChooser(searchResults, "NPC_", "~ Choose NPC to Spawn ~", showName = true, showEditorId = false, showFormId = true)
     if selection > -1
-        int result = Search.GetNthResultInCategory(searchResults, "NPC_", selection)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "NPC_", selection)
         int count = GetUserInput(1) as int
         if ! count
             count = 1
         endIf
-        string formId = Search.GetResultFormID(result)
+        string formId = ConsoleSearch.GetResultFormID(result)
         Form theForm = FormHelper.HexToForm(formId)
         PlayerRef.PlaceAtMe(theForm, count)
     endIf
@@ -702,8 +702,8 @@ endFunction
 function ShowCategory_Furniture(int searchResults)
     int selection = ShowSearchResultChooser(searchResults, "FURN", "~ Choose Furniture to Place ~", showName = true, showEditorId = true, showFormId = true)
     if selection > -1
-        int result = Search.GetNthResultInCategory(searchResults, "FURN", selection)
-        string formId = Search.GetResultFormID(result)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "FURN", selection)
+        string formId = ConsoleSearch.GetResultFormID(result)
         Debug.MessageBox("Cast spell to place furniture")
         PlayerRef.AddSpell(Search_Placement_Spell)
         PlayerRef.EquipSpell(Search_Placement_Spell, 0)
@@ -715,8 +715,8 @@ endFunction
 function ShowCategory_Marker(int searchResults)
     int selection = ShowSearchResultChooser(searchResults, "LCRT", "~ Choose Marker ~", showName = false, showEditorId = true, showFormId = true)
     if selection > -1
-        int result = Search.GetNthResultInCategory(searchResults, "LCRT", selection)
-        string formId = Search.GetResultFormID(result)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "LCRT", selection)
+        string formId = ConsoleSearch.GetResultFormID(result)
         Debug.MessageBox(formId)
         Form theMarker = FormHelper.HexToForm(formId)
         Debug.MessageBox(theMarker)
@@ -739,9 +739,9 @@ function ShowCategory_Spell(int searchResults)
         ShowSpellTradingMenu()
 
     elseIf selection > -1
-        int result = Search.GetNthResultInCategory(searchResults, "SPEL", selection)
-        string editorId = Search.GetResultEditorID(result)
-        string formId = Search.GetResultFormID(result)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "SPEL", selection)
+        string editorId = ConsoleSearch.GetResultEditorID(result)
+        string formId = ConsoleSearch.GetResultFormID(result)
         Spell theSpell = FormHelper.HexToForm(formId) as Spell
         PlayerRef.AddSpell(theSpell)
         Debug.MessageBox("Added " + theSpell.GetName() + " the player")
@@ -751,9 +751,9 @@ endFunction
 function ShowCategory_ImageSpaceModifier(int searchResults)
     int selection = ShowSearchResultChooser(searchResults, "IMAD", "~ Choose Image Space Modifier to Preview ~", showName = true, showEditorId = true, showFormId = true)
     if selection > -1
-        int result = Search.GetNthResultInCategory(searchResults, "IMAD", selection)
-        string editorId = Search.GetResultEditorID(result)
-        string formId = Search.GetResultFormID(result)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "IMAD", selection)
+        string editorId = ConsoleSearch.GetResultEditorID(result)
+        string formId = ConsoleSearch.GetResultFormID(result)
         ImageSpaceModifier theImad = FormHelper.HexToForm(formId) as ImageSpaceModifier
         theImad.Apply(1.0)
         Debug.MessageBox("Applied " + editorId)
@@ -763,9 +763,9 @@ endFunction
 function ShowCategory_Message(int searchResults)
     int selection = ShowSearchResultChooser(searchResults, "MESG", "~ Choose Message to Show ~", showName = true, showEditorId = true, showFormId = true)
     if selection > -1
-        int result = Search.GetNthResultInCategory(searchResults, "MESG", selection)
-        string editorId = Search.GetResultEditorID(result)
-        string formId = Search.GetResultFormID(result)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "MESG", selection)
+        string editorId = ConsoleSearch.GetResultEditorID(result)
+        string formId = ConsoleSearch.GetResultFormID(result)
         Message theMessage = FormHelper.HexToForm(formId) as Message
         theMessage.Show()
     endIf
@@ -774,9 +774,9 @@ endFunction
 function ShowCategory_Shout(int searchResults)
     int selection = ShowSearchResultChooser(searchResults, "SHOU", "~ Choose Shout ~", showName = true, showEditorId = true, showFormId = true)
     if selection > -1
-        int result = Search.GetNthResultInCategory(searchResults, "SHOU", selection)
-        string editorId = Search.GetResultEditorID(result)
-        string formId = Search.GetResultFormID(result)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "SHOU", selection)
+        string editorId = ConsoleSearch.GetResultEditorID(result)
+        string formId = ConsoleSearch.GetResultFormID(result)
         Shout theShout = FormHelper.HexToForm(formId) as Shout
         int i = 0
         bool loop = true
@@ -799,9 +799,9 @@ endFunction
 function ShowCategory_WordOfPower(int searchResults)
     int selection = ShowSearchResultChooser(searchResults, "WOOP", "~ Choose Word of Power ~", showName = true, showEditorId = true, showFormId = true)
     if selection > -1
-        int result = Search.GetNthResultInCategory(searchResults, "WOOP", selection)
-        string editorId = Search.GetResultEditorID(result)
-        string formId = Search.GetResultFormID(result)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "WOOP", selection)
+        string editorId = ConsoleSearch.GetResultEditorID(result)
+        string formId = ConsoleSearch.GetResultFormID(result)
         WordOfPower theWord = FormHelper.HexToForm(formId) as WordOfPower
         Game.TeachWord(theWord)
         Debug.MessageBox("Player has now learned the word " + theWord.GetName())
@@ -811,9 +811,9 @@ endFunction
 function ShowCategory_Idle(int searchResults)
     int selection = ShowSearchResultChooser(searchResults, "IDLE", "~ Choose Idle to Play ~", showName = false, showEditorId = true, showFormId = true)
     if selection > -1
-        int result = Search.GetNthResultInCategory(searchResults, "IDLE", selection)
-        string editorId = Search.GetResultEditorID(result)
-        string formId = Search.GetResultFormID(result)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "IDLE", selection)
+        string editorId = ConsoleSearch.GetResultEditorID(result)
+        string formId = ConsoleSearch.GetResultFormID(result)
         Idle theIdle = FormHelper.HexToForm(formId) as Idle
 
         Actor cursorActor = Game.GetCurrentCrosshairRef() as Actor
@@ -838,9 +838,9 @@ endFunction
 function ShowCategory_Dialogue(int searchResults)
     int selection = ShowSearchResultChooser(searchResults, "DIAL", "~ Choose Dialogue Topic ~", showName = false, showEditorId = true, showFormId = false)
     if selection > -1
-        int result = Search.GetNthResultInCategory(searchResults, "DIAL", selection)
-        string editorId = Search.GetResultEditorID(result)
-        string formId = Search.GetResultFormID(result)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "DIAL", selection)
+        string editorId = ConsoleSearch.GetResultEditorID(result)
+        string formId = ConsoleSearch.GetResultFormID(result)
 
         Actor cursorActor = Game.GetCurrentCrosshairRef() as Actor
 
@@ -858,9 +858,9 @@ endFunction
 function ShowCategory_SoulGem(int searchResults)
     int selection = ShowSearchResultChooser(searchResults, "SLGM", "~ Choose Soul Gem ~", showName = false, showEditorId = true, showFormId = true)
     if selection > -1
-        int result = Search.GetNthResultInCategory(searchResults, "SLGM", selection)
-        string editorId = Search.GetResultEditorID(result)
-        string formId = Search.GetResultFormID(result)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "SLGM", selection)
+        string editorId = ConsoleSearch.GetResultEditorID(result)
+        string formId = ConsoleSearch.GetResultFormID(result)
         Idle theIdle = FormHelper.HexToForm(formId) as Idle
     endIf
 endFunction
@@ -956,7 +956,7 @@ int function ShowSearchResultChooser(int searchResults, string category, string 
         currentIndex += 1
     endIf
 
-    int count = Search.GetResultCategoryCount(searchResults, category)
+    int count = ConsoleSearch.GetResultCategoryCount(searchResults, category)
 
     int selectionIndexToNthIndex = JIntMap.object()
     JValue.retain(selectionIndexToNthIndex)
@@ -964,10 +964,10 @@ int function ShowSearchResultChooser(int searchResults, string category, string 
     int itemIndex = 0
     int i = 0
     while i < count
-        int result = Search.GetNthResultInCategory(searchResults, category, i)
-        string name = Search.GetResultName(result)
-        string formId = Search.GetResultFormID(result)
-        string editorId = Search.GetResultEditorID(result)
+        int result = ConsoleSearch.GetNthResultInCategory(searchResults, category, i)
+        string name = ConsoleSearch.GetResultName(result)
+        string formId = ConsoleSearch.GetResultFormID(result)
+        string editorId = ConsoleSearch.GetResultEditorID(result)
         string prefix = ""
         string text = ""
         if showName
@@ -1054,10 +1054,10 @@ endFunction
 int function ChooseEnchantment()
     string enchantmentQuery = GetUserInput()
     if enchantmentQuery
-        int enchantmentSearchResults = Search.ExecuteSearch(enchantmentQuery)
+        int enchantmentSearchResults = ConsoleSearch.ExecuteSearch(enchantmentQuery)
         int enchantmentIndex = ShowSearchResultChooser(enchantmentSearchResults, "ENCH", "~ Choose Enchantment to Apply ~")
         if enchantmentIndex > -1
-            int enchantmentResult = Search.GetNthResultInCategory(enchantmentSearchResults, "ENCH", enchantmentIndex)
+            int enchantmentResult = ConsoleSearch.GetNthResultInCategory(enchantmentSearchResults, "ENCH", enchantmentIndex)
             return enchantmentResult
         endIf
     endIf
@@ -1147,11 +1147,11 @@ UIMagicMenu property MagicMenu            auto
 
 function ShowInventoryViewForCategory(int searchResults, string category)
     ResetInventoryView()
-    int count = Search.GetResultCategoryCount(searchResults, category)
+    int count = ConsoleSearch.GetResultCategoryCount(searchResults, category)
     int i = 0
     while i < count
-        int item = Search.GetNthResultInCategory(searchResults, category, i)
-        string formId = Search.GetResultFormID(item)
+        int item = ConsoleSearch.GetNthResultInCategory(searchResults, category, i)
+        string formId = ConsoleSearch.GetResultFormID(item)
         Form theForm = FormHelper.HexToForm(formId)
         if theForm.GetType() == 42 || theForm.GetType() == 52 ; AMMO or SLGM
             AddToInventoryView(theForm, 50)
@@ -1186,11 +1186,11 @@ function RemoveAllSpells(actor theActor)
 endFunction
 
 function AddAllSpellsToItemAndSpellStorage(int searchResults)
-    int spellCount = Search.GetResultCategoryCount(searchResults, "SPEL")
+    int spellCount = ConsoleSearch.GetResultCategoryCount(searchResults, "SPEL")
     int i = 0 
     while i < spellCount
-        int spellResult = Search.GetNthResultInCategory(searchResults, "SPEL", i)
-        string formId = Search.GetResultFormID(spellResult)
+        int spellResult = ConsoleSearch.GetNthResultInCategory(searchResults, "SPEL", i)
+        string formId = ConsoleSearch.GetResultFormID(spellResult)
         Spell theSpell = FormHelper.HexToForm(formId) as Spell
         ItemAndSpellStorage.AddSpell(theSpell)
         i += 1

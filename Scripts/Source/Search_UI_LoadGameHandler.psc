@@ -5,7 +5,7 @@ Simply calls `Search_UI.Setup()` on player load game.}
 
 event OnInit()
     ; Load up the spell for testing
-    Spell theSpell = Game.GetFormFromFile(0xd64, "Search.esp") as Spell
+    Spell theSpell = Game.GetFormFromFile(0xd64, "ConsoleSearch.esp") as Spell
     GetActorReference().EquipSpell(theSpell, 0)
     GetActorReference().EquipSpell(theSpell, 1)
 endEvent
