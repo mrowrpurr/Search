@@ -1,1 +1,5 @@
-Scriptname Search_WeatherSearchProvider extends ReferenceAlias  
+scriptName Search_WeatherSearchProvider extends SearchProvider  
+
+event OnSearch()
+
+endEvent
