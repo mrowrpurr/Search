@@ -1,4 +1,7 @@
 {
+    "search_providers": [
+        "Weather"
+    ],
     "keyboard_shortcuts": {
         "ui": {
             "key": 31,

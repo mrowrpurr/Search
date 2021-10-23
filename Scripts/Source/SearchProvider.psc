@@ -3,17 +3,17 @@ scriptName SearchProvider extends ReferenceAlias
 custom Search Provider for the "Search" mod.}
 
 event OnInit()
-
+    ;
 endEvent
 
 event OnPlayerLoadGame()
-
+    ;
 endEvent
 
 ; Override this event to implement your search provider.
 ;
 ; ```
-; event OnSearch()
+; event OnSearch(string query)
 ;   int result = NewSearchResult()
 ;   result.AddResult( \
 ;     category = "Actor References",
@@ -23,6 +23,9 @@ endEvent
 ;   )
 ; endEvent
 ; ```
-event OnSearch()
-
+event OnSearch(string query)
 endEvent
+
+function AddSearchResult(string category, string displayText, string formId = "")
+
+endFunction
