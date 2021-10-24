@@ -41,13 +41,9 @@ int function GetSearchResultHistory() global
 endFunction
 
 int function ExecuteQuery(string query, float timeout = 5.0) global
-    Debug.MessageBox("Execute Query " + query)
-
     ; Get all of the providers to search
     EnsureConfig()
     string[] providerNames = GetSearchProviderNames()
-
-    Debug.MessageBox("Provider Names: " + providerNames)
 
     ; Store the results from each searched provider
     int providerResults = JArray.object()
@@ -58,7 +54,6 @@ int function ExecuteQuery(string query, float timeout = 5.0) global
     ModEvent.PushString(searchEvent, query)
     ModEvent.PushInt(searchEvent, providerResults)
     ModEvent.Send(searchEvent)
-    Debug.MessageBox("Sent SearchQuery event")
 
     ; Wait for the search query responses...
     float searchStartTime = Utility.GetCurrentRealTime()
@@ -66,9 +61,6 @@ int function ExecuteQuery(string query, float timeout = 5.0) global
           && (Utility.GetCurrentRealTime() - searchStartTime) < timeout
         Utility.WaitMenuMode(0.1)
     endWhile
-
-    JValue.writeToFile(providerResults, "ProviderResults.json")
-    Debug.MessageBox("Provider Results.json")
 
     return providerResults
 endFunction

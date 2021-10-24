@@ -7,10 +7,16 @@ string _providerName
 string property ProviderName
     string function get()
         if ! _providerName
-            string theFullScriptName = self ; [Search_FooSearchProvider < (00000000)>]
-            int theSpace = StringUtil.Find(theFullScriptName, " ")
-            string theScriptName = StringUtil.Substring(theFullScriptName, 1, theSpace)
-            Debug.MessageBox("Script name: '" + theScriptName + "'")
+            _providerName = self ; [Search_FooSearchProvider < (00000000)>]
+            int theSpaceIndex = StringUtil.Find(_providerName, " ")
+            _providerName = StringUtil.Substring(_providerName, 1, theSpaceIndex) ; Search_FooSearchProvider
+            int searchProviderIndex = StringUtil.Find(_providerName, "SearchProvider")
+            if searchProviderIndex > -1
+                _providerName = StringUtil.Substring(_providerName, 0, searchProviderIndex) ; Search_Foo
+                if StringUtil.Find(_providerName, "Search_") == 0
+                    _providerName = StringUtil.Substring(_providerName, 7) ; Foo
+                endIf
+            endIf
         endIf
         return _providerName
     endFunction
@@ -36,7 +42,6 @@ endFunction
 
 ; Do not override this event. Use `PerformSearch()` instead.
 event OnSearchQuery(string query, int searchResultArray)
-    Debug.MessageBox("GOT A QUERY REQUEST!!! " + self)
     int result = Search.NewSearchResultSet(provider = ProviderName)
     float startTime = Utility.GetCurrentRealTime()
     int runtime = JMap.object()
