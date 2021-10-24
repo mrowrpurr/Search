@@ -20,8 +20,8 @@ string property ProviderName
         endIf
         return _providerName
     endFunction
-    function set(string providerName)
-        _providerName = ProviderName
+    function set(string name)
+        _providerName = name
     endFunction
 endProperty
 
@@ -35,12 +35,13 @@ endEvent
 
 event OnInit()
     OnProviderInit()
-    RegisterForModEvent("SearchQuery", "OnSearchQuery")
+    RegisterForModEvent("SearchQuery_" + ProviderName, "OnSearchQuery")
+    Debug.MessageBox("Listening for '" + "SearchQuery_" + ProviderName + "'")
 endEvent
 
 event OnPlayerLoadGame()
     OnProviderInit()
-    RegisterForModEvent("SearchQuery", "OnSearchQuery")
+    RegisterForModEvent("SearchQuery_" + ProviderName, "OnSearchQuery")
 endEvent
 
 int function ReadConfigFile(string filename = "config.json")
@@ -66,27 +67,27 @@ endFunction
 
 ; Do not override this event. Use `PerformSearch()` instead.
 event OnSearchQuery(string query, int searchResultArray)
-    int result = Search.CreateResultSet(ProviderName)
-    JArray.addObj(searchResultArray, result)
+    Debug.MessageBox("OnSearchQuery " + query + " " + ProviderName + " " + self)
+    int resultSet = Search.CreateResultSet(ProviderName)
+    JArray.addObj(searchResultArray, resultSet)
     
     ; Store info about this query's total runtime for this provider
     float startTime = Utility.GetCurrentRealTime()
-    JMap.setFlt(result, "startTime", startTime)
+    JMap.setFlt(resultSet, "startTime", startTime)
 
-    PerformSearch(query, result) ; Perform the search!
+    PerformSearch(query, resultSet) ; Perform the search!
 
     float endTime = Utility.GetCurrentRealTime()
-    JMap.setFlt(result, "endTime", endTime)
-    JMap.setFlt(result, "duration", endTime - startTime)
+    JMap.setFlt(resultSet, "endTime", endTime)
+    JMap.setFlt(resultSet, "duration", endTime - startTime)
+    JMap.setStr(resultSet, "done", "true")
 endEvent
 
-function AddSearchResult(int storeResults, string category, string text, string formId = "", string editorId = "", int customData = 0)
-    int result = JMap.object()
-    JArray.addObj(storeResults, result)
-    JMap.setStr(result, "provider", ProviderName)
-    JMap.setStr(result, "category", category)
-    JMap.setStr(result, "displayText", text)
-    JMap.setStr(result, "formId", formId)
-    JMap.setStr(result, "editorId", editorId)
-    JMap.setObj(result, "data", customData)
+function AddSearchResult(int resultSet, string category, string text, string name = "", string formId = "", string editorId = "", int customData = 0)
+    int resultData = JMap.object()
+    Search.AddSearchResult(resultSet, ProviderName, category, text, resultData)
+    JMap.setStr(resultData, "text", text)
+    JMap.setStr(resultData, "name", name)
+    JMap.setStr(resultData, "formId", formId)
+    JMap.setStr(resultData, "editorId", editorId)
 endFunction

@@ -44,7 +44,9 @@ function ClearSearchResultHistory() global
     JArray.clear(GetSearchResultHistory())
 endFunction
 
-int function ExecuteQuery(string query, float timeout = 5.0, bool autoLoadConfig = true) global
+int function ExecuteQuery(string query, float timeout = 5.0, float waitInterval = 0.1, bool autoLoadConfig = true) global
+    Debug.MessageBox("Execute Query???")
+
     if autoLoadConfig
         ; Load Search script configuration from disk
         EnsureConfig()
@@ -52,6 +54,7 @@ int function ExecuteQuery(string query, float timeout = 5.0, bool autoLoadConfig
 
     ; Get all of the providers to search
     string[] providerNames = GetSearchProviderNames()
+    Debug.MessageBox(providerNames)
 
     ; Object representing the search results for this query at this time
     int searchResults = JMap.object()
@@ -65,17 +68,43 @@ int function ExecuteQuery(string query, float timeout = 5.0, bool autoLoadConfig
     int providerResults = JArray.object()
     JMap.setObj(searchResults, "results", providerResults)
 
-    ; Send the search query event
-    int searchEvent = ModEvent.Create("SearchQuery")
-    ModEvent.PushString(searchEvent, query)
-    ModEvent.PushInt(searchEvent, providerResults)
-    ModEvent.Send(searchEvent)
+    ; Send the search query event (separate for each provider)
+    int i = 0
+    while i < providerNames.Length
+        int searchEvent = ModEvent.Create("SearchQuery_" + providerNames[i])
+        Debug.MessageBox("'" + "SearchQuery_" + providerNames[i] + "'")
+        ModEvent.PushString(searchEvent, query)
+        ModEvent.PushInt(searchEvent, providerResults)
+        ModEvent.Send(searchEvent)
+        i += 1
+    endWhile
 
-    ; Wait for the search query responses...
+    ; Wait for the search query responses... including checking if they are "done"...
+    bool searchComplete = false
     float searchStartTime = Utility.GetCurrentRealTime()
     while JArray.count(providerResults) < providerNames.Length \
-          && (Utility.GetCurrentRealTime() - searchStartTime) < timeout
-        Utility.WaitMenuMode(0.1)
+        && (Utility.GetCurrentRealTime() - searchStartTime) < timeout \
+        && ! searchComplete
+        if JArray.count(providerResults) == providerNames.Length
+            i = 0
+            bool allDone = true
+            while i < providerNames.Length && allDone
+                int thisProviderResult = JArray.getObj(providerResults, i)
+                bool isDone = JMap.getStr(thisProviderResult, "done") == "true"
+                if ! isDone
+                    allDone = false
+                endIf
+                i += 1
+            endWhile
+            if allDone
+                Debug.MessageBox("All done, search complete")
+                searchComplete = true
+            else
+                Utility.WaitMenuMode(waitInterval)
+            endIf
+        else
+            Utility.WaitMenuMode(waitInterval)
+        endIf
     endWhile
 
     ; Store info about this query's total runtime (across all providers)
@@ -83,7 +112,7 @@ int function ExecuteQuery(string query, float timeout = 5.0, bool autoLoadConfig
     JMap.setFlt(searchResults, "endTime", endTime)
     JMap.setFlt(searchResults, "duration", endTime - startTime)
 
-    JValue.writeToFile(searchResults, "Search ExecuteQuery Results " + query + ".json")
+    JValue.writeToFile(GetSearchResultHistory(), "All ExecuteQuery Results.json")
 
     return searchResults
 endFunction
@@ -112,4 +141,6 @@ function AddSearchResult(int resultSet, string provider, string category, string
     endIf
 
     JArray.addObj(categoryArray, result)
+
+    Debug.MessageBox("Add Search Result to result set " + resultSet + " " + provider + " " + category + " " + displayText)
 endFunction

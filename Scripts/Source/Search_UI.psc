@@ -271,78 +271,78 @@ function SortCategoryNames(string[] categoryNames)
 endFunction
 
 function ShowSearchCategorySelection(string query, int searchResults)
-    string[] categoryNames = ConsoleSearch.GetResultCategories(searchResults)
-    if ! categoryNames
-        Debug.MessageBox("No results found for '" + query + "'")
-        return
-    endIf
+    ; string[] categoryNames = ConsoleSearch.GetResultCategories(searchResults)
+    ; if ! categoryNames
+    ;     Debug.MessageBox("No results found for '" + query + "'")
+    ;     return
+    ; endIf
 
-    ; Bubble Sort
-    ; https://www.creationkit.com/index.php?title=User:Sclerocephalus#A_short_function_for_sorting_arrays
-    SortCategoryNames(categoryNames) 
+    ; ; Bubble Sort
+    ; ; https://www.creationkit.com/index.php?title=User:Sclerocephalus#A_short_function_for_sorting_arrays
+    ; SortCategoryNames(categoryNames) 
 
-    bool anyItemTypes = false
-    int categoriesWithCounts = JArray.object()
-    JValue.retain(categoriesWithCounts)
-    int i = 0
-    while i < categoryNames.Length
-        string categoryName = categoryNames[i]
-        if CategoryIsInventoryType(categoryName)
-            anyItemTypes = true
-        endIf
-        string displayName = GetCategoryDisplayName(categoryName)
-        int count = ConsoleSearch.GetResultCategoryCount(searchResults, categoryName)
-        JArray.addStr(categoriesWithCounts, displayName + " (" + count + ")")
-        i += 1
-    endWhile
+    ; bool anyItemTypes = false
+    ; int categoriesWithCounts = JArray.object()
+    ; JValue.retain(categoriesWithCounts)
+    ; int i = 0
+    ; while i < categoryNames.Length
+    ;     string categoryName = categoryNames[i]
+    ;     if CategoryIsInventoryType(categoryName)
+    ;         anyItemTypes = true
+    ;     endIf
+    ;     string displayName = GetCategoryDisplayName(categoryName)
+    ;     int count = ConsoleSearch.GetResultCategoryCount(searchResults, categoryName)
+    ;     JArray.addStr(categoriesWithCounts, displayName + " (" + count + ")")
+    ;     i += 1
+    ; endWhile
 
-    int options = JArray.object()
-    if anyItemTypes
-        JArray.addStr(options, "[View All Items]")
-    endIf
-    JArray.addFromArray(options, categoriesWithCounts)
+    ; int options = JArray.object()
+    ; if anyItemTypes
+    ;     JArray.addStr(options, "[View All Items]")
+    ; endIf
+    ; JArray.addFromArray(options, categoriesWithCounts)
 
-    string categoryNameWithCount = GetUserSelection(JArray.asStringArray(options), showFilter = false)
+    ; string categoryNameWithCount = GetUserSelection(JArray.asStringArray(options), showFilter = false)
 
-    if categoryNameWithCount
-        if categoryNameWithCount == "[View All Items]"
-            CurrentNotification = "Loading Items"
-            RegisterForSingleUpdate(0.0)
-            ResetInventoryView()
-            i = 0
-            while i < categoryNames.Length
-                string categoryName = categoryNames[i]
-                if CategoryIsInventoryType(categoryName)
-                    int categoryCount = ConsoleSearch.GetResultCategoryCount(searchResults, categoryName)
-                    int categoryIndex = 0
-                    while categoryIndex < categoryCount
-                        int item = ConsoleSearch.GetNthResultInCategory(searchResults, categoryName, categoryIndex)
-                        string formId = ConsoleSearch.GetResultFormID(item)
-                        Form theForm = FormHelper.HexToForm(formId)
-                        if theForm.GetType() == 42 || theForm.GetType() == 52 ; AMMO or SLGM
-                            AddToInventoryView(theForm, 50)
-                        else
-                            AddToInventoryView(theForm)
-                        endIf
-                        categoryIndex += 1
-                    endWhile
-                endIf
-                i += 1
-            endWhile
-            CurrentNotification = ""
-            ShowInventoryView()
+    ; if categoryNameWithCount
+    ;     if categoryNameWithCount == "[View All Items]"
+    ;         CurrentNotification = "Loading Items"
+    ;         RegisterForSingleUpdate(0.0)
+    ;         ResetInventoryView()
+    ;         i = 0
+    ;         while i < categoryNames.Length
+    ;             string categoryName = categoryNames[i]
+    ;             if CategoryIsInventoryType(categoryName)
+    ;                 int categoryCount = ConsoleSearch.GetResultCategoryCount(searchResults, categoryName)
+    ;                 int categoryIndex = 0
+    ;                 while categoryIndex < categoryCount
+    ;                     int item = ConsoleSearch.GetNthResultInCategory(searchResults, categoryName, categoryIndex)
+    ;                     string formId = ConsoleSearch.GetResultFormID(item)
+    ;                     Form theForm = FormHelper.HexToForm(formId)
+    ;                     if theForm.GetType() == 42 || theForm.GetType() == 52 ; AMMO or SLGM
+    ;                         AddToInventoryView(theForm, 50)
+    ;                     else
+    ;                         AddToInventoryView(theForm)
+    ;                     endIf
+    ;                     categoryIndex += 1
+    ;                 endWhile
+    ;             endIf
+    ;             i += 1
+    ;         endWhile
+    ;         CurrentNotification = ""
+    ;         ShowInventoryView()
             
-        elseIf categoryNameWithCount == "[View All Spells]"
-            Debug.MessageBox("TODO")
+    ;     elseIf categoryNameWithCount == "[View All Spells]"
+    ;         Debug.MessageBox("TODO")
 
-        else
-            int categoryIndex = JArray.findStr(categoriesWithCounts, categoryNameWithCount)
-            string category = categoryNames[categoryIndex]
-            ShowCategory(searchResults, category)
-        endIf
-    endIf
+    ;     else
+    ;         int categoryIndex = JArray.findStr(categoriesWithCounts, categoryNameWithCount)
+    ;         string category = categoryNames[categoryIndex]
+    ;         ShowCategory(searchResults, category)
+    ;     endIf
+    ; endIf
 
-    JValue.release(categoriesWithCounts)
+    ; JValue.release(categoriesWithCounts)
 endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -350,520 +350,520 @@ endFunction
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 function ShowCategory(int searchResults, string category)
-    if category == "[View All Items]"
+    ; if category == "[View All Items]"
 
-    elseIf category == "CELL"
-        ShowCategory_Cell(searchResults)
+    ; elseIf category == "CELL"
+    ;     ShowCategory_Cell(searchResults)
 
-    elseIf category == "DIAL"
-        ShowCategory_Dialogue(searchResults)
+    ; elseIf category == "DIAL"
+    ;     ShowCategory_Dialogue(searchResults)
 
-    elseIf category == "NPC_"
-        ShowCategory_Actors(searchResults)
+    ; elseIf category == "NPC_"
+    ;     ShowCategory_Actors(searchResults)
 
-    elseIf category == "ARMO"
-        ShowCategory_Armor(searchResults)
+    ; elseIf category == "ARMO"
+    ;     ShowCategory_Armor(searchResults)
 
-    elseIf category == "WEAP"
-        ShowCategory_Weapon(searchResults)
+    ; elseIf category == "WEAP"
+    ;     ShowCategory_Weapon(searchResults)
 
-    elseIf category == "FURN"
-        ShowCategory_Furniture(searchResults)
+    ; elseIf category == "FURN"
+    ;     ShowCategory_Furniture(searchResults)
 
-    elseIf category == "QUST"
-        ShowCategory_Quest(searchResults)
+    ; elseIf category == "QUST"
+    ;     ShowCategory_Quest(searchResults)
 
-    elseIf category == "SPEL"
-        ShowCategory_Spell(searchResults)
+    ; elseIf category == "SPEL"
+    ;     ShowCategory_Spell(searchResults)
 
-    elseIf category == "SHOU"
-        ShowCategory_Shout(searchResults)
+    ; elseIf category == "SHOU"
+    ;     ShowCategory_Shout(searchResults)
 
-    elseIf category == "WOOP"
-        ShowCategory_WordOfPower(searchResults)
+    ; elseIf category == "WOOP"
+    ;     ShowCategory_WordOfPower(searchResults)
 
-    elseIf category == "IDLE"
-        ShowCategory_Idle(searchResults)
+    ; elseIf category == "IDLE"
+    ;     ShowCategory_Idle(searchResults)
 
-    elseIf category == "IMAD"
-        ShowCategory_ImageSpaceModifier(searchResults)
+    ; elseIf category == "IMAD"
+    ;     ShowCategory_ImageSpaceModifier(searchResults)
 
-    elseIf category == "MESG"
-        ShowCategory_Message(searchResults)
+    ; elseIf category == "MESG"
+    ;     ShowCategory_Message(searchResults)
 
-    ; elseIf category == "SLGM"
-    ;     ShowCategory_SoulGem(searchResults)
+    ; ; elseIf category == "SLGM"
+    ; ;     ShowCategory_SoulGem(searchResults)
 
-    elseIf category == "LCRT"
-        Debug.MessageBox("Markers aren't yet really useful, we'll make it so you can move them, move TO them, and SEE them by changing the .ini settings")
-        ShowCategory_Marker(searchResults)
+    ; elseIf category == "LCRT"
+    ;     Debug.MessageBox("Markers aren't yet really useful, we'll make it so you can move them, move TO them, and SEE them by changing the .ini settings")
+    ;     ShowCategory_Marker(searchResults)
 
-    elseIf CategoryIsInventoryType(category)
-        int selection = ShowSearchResultChooser(searchResults, category, "~ " + GetCategoryDisplayName(category) + " ~", showName = true, showEditorId = true, showFormId = true, option1 = "[View All Items]")
-        if selection == -2
-            ShowInventoryViewForCategory(searchResults, category)
+    ; elseIf CategoryIsInventoryType(category)
+    ;     int selection = ShowSearchResultChooser(searchResults, category, "~ " + GetCategoryDisplayName(category) + " ~", showName = true, showEditorId = true, showFormId = true, option1 = "[View All Items]")
+    ;     if selection == -2
+    ;         ShowInventoryViewForCategory(searchResults, category)
 
-        elseIf selection > -1
-            int result = ConsoleSearch.GetNthResultInCategory(searchResults, category, selection)
-            string editorId = ConsoleSearch.GetResultEditorID(result)
-            string formId = ConsoleSearch.GetResultFormID(result)
-            Form theItem = FormHelper.HexToForm(formId) as Form
-            int count = 1
-            if theItem.GetType() == 42 || theItem.GetType() == 52 ; AMMO or SLGM
-                count = 50
-            endIf
-            count = GetUserInput(count) as int
-            if count > 0
-                PlayerRef.AddItem(theItem, count)
-            endIf
-        endIf
+    ;     elseIf selection > -1
+    ;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, category, selection)
+    ;         string editorId = ConsoleSearch.GetResultEditorID(result)
+    ;         string formId = ConsoleSearch.GetResultFormID(result)
+    ;         Form theItem = FormHelper.HexToForm(formId) as Form
+    ;         int count = 1
+    ;         if theItem.GetType() == 42 || theItem.GetType() == 52 ; AMMO or SLGM
+    ;             count = 50
+    ;         endIf
+    ;         count = GetUserInput(count) as int
+    ;         if count > 0
+    ;             PlayerRef.AddItem(theItem, count)
+    ;         endIf
+    ;     endIf
 
-    else        
-        int selection = ShowSearchResultChooser(searchResults, category, "~ " + GetCategoryDisplayName(category) + " ~", showName = true, showEditorId = true, showFormId = true)
-        if selection > -1
-            int    result   = ConsoleSearch.GetNthResultInCategory(searchResults, category, selection)
-            string formId   = ConsoleSearch.GetResultFormID(result)
-            string editorId = ConsoleSearch.GetResultEditorID(result)
-            string name     = ConsoleSearch.GetResultName(result)
-            string text     = "[Item Info]\n\n"
-            if editorId
-                text += editorId + "\n\n"
-            endIf
-            text += "(" + formId + ")\n\n"
-            if name
-                text += name
-            endIf
-            Debug.MessageBox(text)
-        endIf
-    endIf
+    ; else        
+    ;     int selection = ShowSearchResultChooser(searchResults, category, "~ " + GetCategoryDisplayName(category) + " ~", showName = true, showEditorId = true, showFormId = true)
+    ;     if selection > -1
+    ;         int    result   = ConsoleSearch.GetNthResultInCategory(searchResults, category, selection)
+    ;         string formId   = ConsoleSearch.GetResultFormID(result)
+    ;         string editorId = ConsoleSearch.GetResultEditorID(result)
+    ;         string name     = ConsoleSearch.GetResultName(result)
+    ;         string text     = "[Item Info]\n\n"
+    ;         if editorId
+    ;             text += editorId + "\n\n"
+    ;         endIf
+    ;         text += "(" + formId + ")\n\n"
+    ;         if name
+    ;             text += name
+    ;         endIf
+    ;         Debug.MessageBox(text)
+    ;     endIf
+    ; endIf
 endFunction
 
-function ShowCategory_Cell(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "CELL", "~ Choose Cell to Teleport ~", showName = false, showEditorId = true, showFormId = false)
-    if selection >= 0
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "CELL", selection)
-        string editorId = ConsoleSearch.GetResultEditorID(result)
-        Debug.CenterOnCell(editorId)
-    endIf
-endFunction
+; function ShowCategory_Cell(int searchResults)
+;     int selection = ShowSearchResultChooser(searchResults, "CELL", "~ Choose Cell to Teleport ~", showName = false, showEditorId = true, showFormId = false)
+;     if selection >= 0
+;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, "CELL", selection)
+;         string editorId = ConsoleSearch.GetResultEditorID(result)
+;         Debug.CenterOnCell(editorId)
+;     endIf
+; endFunction
 
-function ShowCategory_Quest(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "QUST", "~ Choose Quest ~", showName = true, showEditorId = true, showFormId = true)
-    if selection > -1
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "QUST", selection)
-        string editorId = ConsoleSearch.GetResultEditorID(result)
-        string formId = ConsoleSearch.GetResultFormID(result)
-        Quest theQuest = FormHelper.HexToForm(formId) as Quest
+; function ShowCategory_Quest(int searchResults)
+;     int selection = ShowSearchResultChooser(searchResults, "QUST", "~ Choose Quest ~", showName = true, showEditorId = true, showFormId = true)
+;     if selection > -1
+;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, "QUST", selection)
+;         string editorId = ConsoleSearch.GetResultEditorID(result)
+;         string formId = ConsoleSearch.GetResultFormID(result)
+;         Quest theQuest = FormHelper.HexToForm(formId) as Quest
 
-        int listOptions = JArray.object()
-        JArray.addStr(listOptions, "[" + editorId + "]")
-        if theQuest.IsCompleted()
-            JArray.addStr(listOptions, "[ Completed ]")
-        endIf
-        JArray.addStr(listOptions, "[ Current Stage: " + theQuest.GetCurrentStageID() + " ]")
-        JArray.addStr(listOptions, "Start Quest")
-        JArray.addStr(listOptions, "Stop Quest")
-        JArray.addStr(listOptions, "Reset Quest")
-        JArray.addStr(listOptions, "Set Stage")
-        JArray.addStr(listOptions, "Set Objective Displayed")
-        JArray.addStr(listOptions, "Set Objective Completed")
-        JArray.addStr(listOptions, "Set Objective Failed")
-        JArray.addStr(listOptions, "Move To Next Quest Objective Location")
+;         int listOptions = JArray.object()
+;         JArray.addStr(listOptions, "[" + editorId + "]")
+;         if theQuest.IsCompleted()
+;             JArray.addStr(listOptions, "[ Completed ]")
+;         endIf
+;         JArray.addStr(listOptions, "[ Current Stage: " + theQuest.GetCurrentStageID() + " ]")
+;         JArray.addStr(listOptions, "Start Quest")
+;         JArray.addStr(listOptions, "Stop Quest")
+;         JArray.addStr(listOptions, "Reset Quest")
+;         JArray.addStr(listOptions, "Set Stage")
+;         JArray.addStr(listOptions, "Set Objective Displayed")
+;         JArray.addStr(listOptions, "Set Objective Completed")
+;         JArray.addStr(listOptions, "Set Objective Failed")
+;         JArray.addStr(listOptions, "Move To Next Quest Objective Location")
 
-        string questAction = GetUserSelection(JArray.asStringArray(listOptions))
+;         string questAction = GetUserSelection(JArray.asStringArray(listOptions))
 
-        if questAction == "Start Quest"
-            theQuest.Start()
-        elseIf questAction == "Stop Quest"
-            theQuest.Stop()
-        elseIf questAction == "Reset Quest"
-            theQuest.Reset()
-        elseIf questAction == "Set Stage"
-            theQuest.SetCurrentStageID(GetUserInput() as int)
-        elseIf questAction == "Set Objective Displayed"
-            theQuest.SetObjectiveDisplayed(GetUserInput() as int)
-        elseIf questAction == "Set Objective Completed"
-            theQuest.SetObjectiveCompleted(GetUserInput() as int)
-        elseIf questAction == "Set Objective Failed"
-            theQuest.SetObjectiveFailed(GetUserInput() as int)
-        elseIf questAction == "Move To Next Quest Objective Location"
-            ConsoleUtil.ExecuteCommand("movetoqt " + editorId)
-        endIf
-    endIf
-endFunction
+;         if questAction == "Start Quest"
+;             theQuest.Start()
+;         elseIf questAction == "Stop Quest"
+;             theQuest.Stop()
+;         elseIf questAction == "Reset Quest"
+;             theQuest.Reset()
+;         elseIf questAction == "Set Stage"
+;             theQuest.SetCurrentStageID(GetUserInput() as int)
+;         elseIf questAction == "Set Objective Displayed"
+;             theQuest.SetObjectiveDisplayed(GetUserInput() as int)
+;         elseIf questAction == "Set Objective Completed"
+;             theQuest.SetObjectiveCompleted(GetUserInput() as int)
+;         elseIf questAction == "Set Objective Failed"
+;             theQuest.SetObjectiveFailed(GetUserInput() as int)
+;         elseIf questAction == "Move To Next Quest Objective Location"
+;             ConsoleUtil.ExecuteCommand("movetoqt " + editorId)
+;         endIf
+;     endIf
+; endFunction
 
-function ShowCategory_Armor(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "ARMO", "~ View Armor ~", showName = true, showEditorId = true, showFormId = true, option1 = "[View All Items]")
-    if selection > -1
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "ARMO", selection)
-        string editorId = ConsoleSearch.GetResultEditorID(result)
-        string formId = ConsoleSearch.GetResultFormID(result)
-        Armor theArmor = FormHelper.HexToForm(formId) as Armor
+; function ShowCategory_Armor(int searchResults)
+;     int selection = ShowSearchResultChooser(searchResults, "ARMO", "~ View Armor ~", showName = true, showEditorId = true, showFormId = true, option1 = "[View All Items]")
+;     if selection > -1
+;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, "ARMO", selection)
+;         string editorId = ConsoleSearch.GetResultEditorID(result)
+;         string formId = ConsoleSearch.GetResultFormID(result)
+;         Armor theArmor = FormHelper.HexToForm(formId) as Armor
 
-        int listOptions = JArray.object()
-        JArray.addStr(listOptions, "[" + theArmor.GetName() + "]")
-        JArray.addStr(listOptions, "Edit Armor Rating")
-        JArray.addStr(listOptions, "Edit Armor Type")
-        JArray.addStr(listOptions, "Set Enchantment")
-        if theArmor.GetEnchantment()
-            JArray.addStr(listOptions, "Set Enchantment Magnitude")
-        endIf
-        JArray.addStr(listOptions, "Set Slot Mask")
+;         int listOptions = JArray.object()
+;         JArray.addStr(listOptions, "[" + theArmor.GetName() + "]")
+;         JArray.addStr(listOptions, "Edit Armor Rating")
+;         JArray.addStr(listOptions, "Edit Armor Type")
+;         JArray.addStr(listOptions, "Set Enchantment")
+;         if theArmor.GetEnchantment()
+;             JArray.addStr(listOptions, "Set Enchantment Magnitude")
+;         endIf
+;         JArray.addStr(listOptions, "Set Slot Mask")
 
-        string armorAction = GetUserSelection(JArray.asStringArray(listOptions))
+;         string armorAction = GetUserSelection(JArray.asStringArray(listOptions))
 
-        if armorAction == "Edit Armor Rating"
-            int armorRating = GetUserInput(theArmor.GetArmorRating()) as int
-            theArmor.SetArmorRating(armorRating)
-            Debug.MessageBox("Set the armor rating of " + theArmor.GetName() + "  to " + armorRating)
-        elseIf armorAction == "Edit Armor Type"
+;         if armorAction == "Edit Armor Rating"
+;             int armorRating = GetUserInput(theArmor.GetArmorRating()) as int
+;             theArmor.SetArmorRating(armorRating)
+;             Debug.MessageBox("Set the armor rating of " + theArmor.GetName() + "  to " + armorRating)
+;         elseIf armorAction == "Edit Armor Type"
 
-        elseIf armorAction == "Set Enchantment"
-            Enchantment theEnchantmentOnArmor
-            while ! theEnchantmentOnArmor
-                int enchantmentResult = ChooseEnchantment()
-                string enchantmentFormId = ConsoleSearch.GetResultFormID(enchantmentResult)
-                Enchantment theEnchantment = FormHelper.HexToForm(enchantmentFormId) as Enchantment
-                if theEnchantment
-                    theArmor.SetEnchantment(theEnchantment)
-                    theEnchantmentOnArmor = theArmor.GetEnchantment()
-                    if theEnchantmentOnArmor
-                        if theEnchantmentOnArmor == theEnchantment
-                            Debug.MessageBox("Applied enchantment " + theEnchantment.GetName() + " to " + theArmor.GetName())
-                        else
-                            theEnchantmentOnArmor = None
-                        endIf
-                    endIf
-                endIf
-            endWhile
+;         elseIf armorAction == "Set Enchantment"
+;             Enchantment theEnchantmentOnArmor
+;             while ! theEnchantmentOnArmor
+;                 int enchantmentResult = ChooseEnchantment()
+;                 string enchantmentFormId = ConsoleSearch.GetResultFormID(enchantmentResult)
+;                 Enchantment theEnchantment = FormHelper.HexToForm(enchantmentFormId) as Enchantment
+;                 if theEnchantment
+;                     theArmor.SetEnchantment(theEnchantment)
+;                     theEnchantmentOnArmor = theArmor.GetEnchantment()
+;                     if theEnchantmentOnArmor
+;                         if theEnchantmentOnArmor == theEnchantment
+;                             Debug.MessageBox("Applied enchantment " + theEnchantment.GetName() + " to " + theArmor.GetName())
+;                         else
+;                             theEnchantmentOnArmor = None
+;                         endIf
+;                     endIf
+;                 endIf
+;             endWhile
 
-        elseIf armorAction == "Set Enchantment Magnitude"
-            Enchantment theEnchantment = theArmor.GetEnchantment()
-            int effectIndex = ChooseNthEnchantmentMagicEffect(theEnchantment)
-            float originalMagnitude = theEnchantment.GetNthEffectMagnitude(effectIndex)
-            float magnitude = GetUserInput(originalMagnitude) as float
-            theEnchantment.SetNthEffectMagnitude(effectIndex, magnitude) 
-            MagicEffect theEffect = theEnchantment.GetNthEffectMagicEffect(effectIndex)
-            Debug.MessageBox("Changed magnitude of " + theEffect.GetName() + " from " + originalMagnitude + " to " + magnitude)
+;         elseIf armorAction == "Set Enchantment Magnitude"
+;             Enchantment theEnchantment = theArmor.GetEnchantment()
+;             int effectIndex = ChooseNthEnchantmentMagicEffect(theEnchantment)
+;             float originalMagnitude = theEnchantment.GetNthEffectMagnitude(effectIndex)
+;             float magnitude = GetUserInput(originalMagnitude) as float
+;             theEnchantment.SetNthEffectMagnitude(effectIndex, magnitude) 
+;             MagicEffect theEffect = theEnchantment.GetNthEffectMagicEffect(effectIndex)
+;             Debug.MessageBox("Changed magnitude of " + theEffect.GetName() + " from " + originalMagnitude + " to " + magnitude)
 
-        elseIf armorAction == "Set Slot Mask"
+;         elseIf armorAction == "Set Slot Mask"
 
-        endIf
+;         endIf
 
-    elseIf selection == -2
-        ; View All Items
-        ShowInventoryViewForCategory(searchResults, "ARMO")
-    endIf
-endFunction
+;     elseIf selection == -2
+;         ; View All Items
+;         ShowInventoryViewForCategory(searchResults, "ARMO")
+;     endIf
+; endFunction
 
-function ShowCategory_Weapon(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "WEAP", "~ View Weapon ~", showName = true, showEditorId = false, showFormId = false, option1 = "[View All Items]")
-    if selection > -1
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "WEAP", selection)
-        string editorId = ConsoleSearch.GetResultEditorID(result)
-        string formId = ConsoleSearch.GetResultFormID(result)
-        Weapon theWeapon = FormHelper.HexToForm(formId) as Weapon
+; function ShowCategory_Weapon(int searchResults)
+;     int selection = ShowSearchResultChooser(searchResults, "WEAP", "~ View Weapon ~", showName = true, showEditorId = false, showFormId = false, option1 = "[View All Items]")
+;     if selection > -1
+;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, "WEAP", selection)
+;         string editorId = ConsoleSearch.GetResultEditorID(result)
+;         string formId = ConsoleSearch.GetResultFormID(result)
+;         Weapon theWeapon = FormHelper.HexToForm(formId) as Weapon
 
-        int listOptions = JArray.object()
-        JArray.addStr(listOptions, "[" + theWeapon.GetName() + "]")
-        JArray.addStr(listOptions, "Add to Inventory")
-        JArray.addStr(listOptions, "Edit Base Damage")
-        JArray.addStr(listOptions, "Edit Critical Damage")
-        JArray.addStr(listOptions, "Edit Weapon Type")
-        JArray.addStr(listOptions, "Enchantment Item")
-        JArray.addStr(listOptions, "Enchantment All Items")
-        if theWeapon.GetEnchantment()
-            JArray.addStr(listOptions, "Set Enchantment Magnitude")
-        endIf
+;         int listOptions = JArray.object()
+;         JArray.addStr(listOptions, "[" + theWeapon.GetName() + "]")
+;         JArray.addStr(listOptions, "Add to Inventory")
+;         JArray.addStr(listOptions, "Edit Base Damage")
+;         JArray.addStr(listOptions, "Edit Critical Damage")
+;         JArray.addStr(listOptions, "Edit Weapon Type")
+;         JArray.addStr(listOptions, "Enchantment Item")
+;         JArray.addStr(listOptions, "Enchantment All Items")
+;         if theWeapon.GetEnchantment()
+;             JArray.addStr(listOptions, "Set Enchantment Magnitude")
+;         endIf
 
-        string weaponAction = GetUserSelection(JArray.asStringArray(listOptions))
+;         string weaponAction = GetUserSelection(JArray.asStringArray(listOptions))
 
-        if weaponAction == "Add to Inventory"
-            int count = GetUserInput(1) as int
-            if ! count
-                count = 1
-            endIf
-            PlayerRef.AddItem(theWeapon, count)
+;         if weaponAction == "Add to Inventory"
+;             int count = GetUserInput(1) as int
+;             if ! count
+;                 count = 1
+;             endIf
+;             PlayerRef.AddItem(theWeapon, count)
 
-        elseIf weaponAction == "Edit Base Damage"
-            int originalBaseDamage = theWeapon.GetBaseDamage()
-            int newBaseDamage = GetUserInput(originalBaseDamage) as int
-            theWeapon.SetBaseDamage(newBaseDamage)
-            Debug.MessageBox("Changed " + theWeapon.GetName() + " base damage from " + originalBaseDamage + " to " + newBaseDamage)
+;         elseIf weaponAction == "Edit Base Damage"
+;             int originalBaseDamage = theWeapon.GetBaseDamage()
+;             int newBaseDamage = GetUserInput(originalBaseDamage) as int
+;             theWeapon.SetBaseDamage(newBaseDamage)
+;             Debug.MessageBox("Changed " + theWeapon.GetName() + " base damage from " + originalBaseDamage + " to " + newBaseDamage)
 
-        elseIf weaponAction == "Edit Critical Damage"
-            ; TODO
+;         elseIf weaponAction == "Edit Critical Damage"
+;             ; TODO
 
-        elseIf weaponAction == "Edit Weapon Type"
-            string originalTypeName = GetWeaponTypeName(theWeapon.GetWeaponType())
-            string newTypeName = GetUserSelection(JMap.allKeysPArray(WeaponTypesMap))
-            if newTypeName
-                int newTypeId = GetWeaponIdFromName(newTypeName)
-                theWeapon.SetWeaponType(newTypeId)
-                Debug.MessageBox("Changed " + theWeapon.GetName() + " type from " + originalTypeName + " to " + newTypeName)
-            endIf
+;         elseIf weaponAction == "Edit Weapon Type"
+;             string originalTypeName = GetWeaponTypeName(theWeapon.GetWeaponType())
+;             string newTypeName = GetUserSelection(JMap.allKeysPArray(WeaponTypesMap))
+;             if newTypeName
+;                 int newTypeId = GetWeaponIdFromName(newTypeName)
+;                 theWeapon.SetWeaponType(newTypeId)
+;                 Debug.MessageBox("Changed " + theWeapon.GetName() + " type from " + originalTypeName + " to " + newTypeName)
+;             endIf
 
-        elseIf weaponAction == "Enchantment Item"
-            Enchantment theEnchantmentOnWeapon
-            ; while ! theEnchantmentOnWeapon
-                int enchantmentResult = ChooseEnchantment()
-                string enchantmentFormId = ConsoleSearch.GetResultFormID(enchantmentResult)
-                Enchantment theEnchantment = FormHelper.HexToForm(enchantmentFormId) as Enchantment
-                if theEnchantment
-                    PlayerRef.AddItem(theWeapon)
-                    PlayerRef.EquipItemEx(theWeapon, equipSlot = 1)
-                    EnchantItem(theEnchantment, 0, 1)
-                    Debug.MessageBox("Enchanted " + theWeapon.GetName() + " with " + theEnchantment.GetName())
-                    ; theEnchantmentOnWeapon = 
-                endIf
-            ; endWhile
+;         elseIf weaponAction == "Enchantment Item"
+;             Enchantment theEnchantmentOnWeapon
+;             ; while ! theEnchantmentOnWeapon
+;                 int enchantmentResult = ChooseEnchantment()
+;                 string enchantmentFormId = ConsoleSearch.GetResultFormID(enchantmentResult)
+;                 Enchantment theEnchantment = FormHelper.HexToForm(enchantmentFormId) as Enchantment
+;                 if theEnchantment
+;                     PlayerRef.AddItem(theWeapon)
+;                     PlayerRef.EquipItemEx(theWeapon, equipSlot = 1)
+;                     EnchantItem(theEnchantment, 0, 1)
+;                     Debug.MessageBox("Enchanted " + theWeapon.GetName() + " with " + theEnchantment.GetName())
+;                     ; theEnchantmentOnWeapon = 
+;                 endIf
+;             ; endWhile
 
-        elseIf weaponAction == "Enchantment All Items"
-            Enchantment theEnchantmentOnWeapon
-            while ! theEnchantmentOnWeapon
-                int enchantmentResult = ChooseEnchantment()
-                string enchantmentFormId = ConsoleSearch.GetResultFormID(enchantmentResult)
-                Enchantment theEnchantment = FormHelper.HexToForm(enchantmentFormId) as Enchantment
-                if theEnchantment
-                    theWeapon.SetEnchantment(theEnchantment)
-                    theEnchantmentOnWeapon = theWeapon.GetEnchantment()
-                    if theEnchantmentOnWeapon
-                        theWeapon.SetEnchantmentValue(10000)
-                        if theEnchantmentOnWeapon == theEnchantment
-                            Debug.MessageBox("Applied enchantment " + theEnchantment.GetName() + " to " + theWeapon.GetName())
-                        else
-                            theEnchantmentOnWeapon = None
-                        endIf
-                    endIf
-                endIf
-            endWhile
+;         elseIf weaponAction == "Enchantment All Items"
+;             Enchantment theEnchantmentOnWeapon
+;             while ! theEnchantmentOnWeapon
+;                 int enchantmentResult = ChooseEnchantment()
+;                 string enchantmentFormId = ConsoleSearch.GetResultFormID(enchantmentResult)
+;                 Enchantment theEnchantment = FormHelper.HexToForm(enchantmentFormId) as Enchantment
+;                 if theEnchantment
+;                     theWeapon.SetEnchantment(theEnchantment)
+;                     theEnchantmentOnWeapon = theWeapon.GetEnchantment()
+;                     if theEnchantmentOnWeapon
+;                         theWeapon.SetEnchantmentValue(10000)
+;                         if theEnchantmentOnWeapon == theEnchantment
+;                             Debug.MessageBox("Applied enchantment " + theEnchantment.GetName() + " to " + theWeapon.GetName())
+;                         else
+;                             theEnchantmentOnWeapon = None
+;                         endIf
+;                     endIf
+;                 endIf
+;             endWhile
             
-        elseIf weaponAction == "Set Enchantment Magnitude"
-            Enchantment theEnchantment = theWeapon.GetEnchantment()
-            int effectIndex = ChooseNthEnchantmentMagicEffect(theEnchantment)
-            float originalMagnitude = theEnchantment.GetNthEffectMagnitude(effectIndex)
-            float magnitude = GetUserInput(originalMagnitude) as float
-            theEnchantment.SetNthEffectMagnitude(effectIndex, magnitude) 
-            MagicEffect theEffect = theEnchantment.GetNthEffectMagicEffect(effectIndex)
-            Debug.MessageBox("Changed magnitude of " + theEffect.GetName() + " from " + originalMagnitude + " to " + magnitude)
+;         elseIf weaponAction == "Set Enchantment Magnitude"
+;             Enchantment theEnchantment = theWeapon.GetEnchantment()
+;             int effectIndex = ChooseNthEnchantmentMagicEffect(theEnchantment)
+;             float originalMagnitude = theEnchantment.GetNthEffectMagnitude(effectIndex)
+;             float magnitude = GetUserInput(originalMagnitude) as float
+;             theEnchantment.SetNthEffectMagnitude(effectIndex, magnitude) 
+;             MagicEffect theEffect = theEnchantment.GetNthEffectMagicEffect(effectIndex)
+;             Debug.MessageBox("Changed magnitude of " + theEffect.GetName() + " from " + originalMagnitude + " to " + magnitude)
 
-        endIf
-    endIf
-endFunction
+;         endIf
+;     endIf
+; endFunction
 
-; TODO support up to 10+ magic effects
-function EnchantItem(Enchantment theEnchanment, int slotMask, int handSlot = 0)
-    MagicEffect[] effects    = new MagicEffect[1]
-    float[]       magnitudes = new float[1]
-    int[]         areas      = new int[1]
-    int[]         durations  = new int[1]
+; ; TODO support up to 10+ magic effects
+; function EnchantItem(Enchantment theEnchanment, int slotMask, int handSlot = 0)
+;     MagicEffect[] effects    = new MagicEffect[1]
+;     float[]       magnitudes = new float[1]
+;     int[]         areas      = new int[1]
+;     int[]         durations  = new int[1]
 
-    effects[0]    = theEnchanment.GetNthEffectMagicEffect(0)
-    magnitudes[0] = theEnchanment.GetNthEffectMagnitude(0)
-    areas[0]      = theEnchanment.GetNthEffectArea(0)
-    durations[0] = theEnchanment.GetNthEffectDuration(0)
+;     effects[0]    = theEnchanment.GetNthEffectMagicEffect(0)
+;     magnitudes[0] = theEnchanment.GetNthEffectMagnitude(0)
+;     areas[0]      = theEnchanment.GetNthEffectArea(0)
+;     durations[0] = theEnchanment.GetNthEffectDuration(0)
 
-    float maxCharge = 1000.0 ; ?
+;     float maxCharge = 1000.0 ; ?
 
-    WornObject.CreateEnchantment( \
-        PlayerRef, \
-        handSlot, \
-        slotMask, \
-        maxCharge, \
-        effects, \
-        magnitudes, \
-        areas, \
-        durations)
+;     WornObject.CreateEnchantment( \
+;         PlayerRef, \
+;         handSlot, \
+;         slotMask, \
+;         maxCharge, \
+;         effects, \
+;         magnitudes, \
+;         areas, \
+;         durations)
 
-    ; ; int i = 0
-    ; ; while i < 200
-    ; ;     Armor theArmor = player.GetEquippedArmorInSlot(i)
-    ; ;     if theArmor
-    ; ;         Debug.MessageBox(theArmor.GetName() + " is equipped in slot " + i + " ---> " + theArmor.GetSlotMask())
-    ; ;     endIf
-    ; ;     i += 1
-    ; ; endWhile
-endFunction
+;     ; ; int i = 0
+;     ; ; while i < 200
+;     ; ;     Armor theArmor = player.GetEquippedArmorInSlot(i)
+;     ; ;     if theArmor
+;     ; ;         Debug.MessageBox(theArmor.GetName() + " is equipped in slot " + i + " ---> " + theArmor.GetSlotMask())
+;     ; ;     endIf
+;     ; ;     i += 1
+;     ; ; endWhile
+; endFunction
 
-function ShowCategory_Actors(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "NPC_", "~ Choose NPC to Spawn ~", showName = true, showEditorId = false, showFormId = true)
-    if selection > -1
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "NPC_", selection)
-        int count = GetUserInput(1) as int
-        if ! count
-            count = 1
-        endIf
-        string formId = ConsoleSearch.GetResultFormID(result)
-        Form theForm = FormHelper.HexToForm(formId)
-        PlayerRef.PlaceAtMe(theForm, count)
-    endIf
-endFunction
+; function ShowCategory_Actors(int searchResults)
+;     int selection = ShowSearchResultChooser(searchResults, "NPC_", "~ Choose NPC to Spawn ~", showName = true, showEditorId = false, showFormId = true)
+;     if selection > -1
+;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, "NPC_", selection)
+;         int count = GetUserInput(1) as int
+;         if ! count
+;             count = 1
+;         endIf
+;         string formId = ConsoleSearch.GetResultFormID(result)
+;         Form theForm = FormHelper.HexToForm(formId)
+;         PlayerRef.PlaceAtMe(theForm, count)
+;     endIf
+; endFunction
 
-function ShowCategory_Furniture(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "FURN", "~ Choose Furniture to Place ~", showName = true, showEditorId = true, showFormId = true)
-    if selection > -1
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "FURN", selection)
-        string formId = ConsoleSearch.GetResultFormID(result)
-        Debug.MessageBox("Cast spell to place furniture")
-        PlayerRef.AddSpell(Search_Placement_Spell)
-        PlayerRef.EquipSpell(Search_Placement_Spell, 0)
-        PlayerRef.EquipSpell(Search_Placement_Spell, 1)
-        ObjectToPlace = FormHelper.HexToForm(formId)
-    endIf
-endFunction
+; function ShowCategory_Furniture(int searchResults)
+;     int selection = ShowSearchResultChooser(searchResults, "FURN", "~ Choose Furniture to Place ~", showName = true, showEditorId = true, showFormId = true)
+;     if selection > -1
+;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, "FURN", selection)
+;         string formId = ConsoleSearch.GetResultFormID(result)
+;         Debug.MessageBox("Cast spell to place furniture")
+;         PlayerRef.AddSpell(Search_Placement_Spell)
+;         PlayerRef.EquipSpell(Search_Placement_Spell, 0)
+;         PlayerRef.EquipSpell(Search_Placement_Spell, 1)
+;         ObjectToPlace = FormHelper.HexToForm(formId)
+;     endIf
+; endFunction
 
-function ShowCategory_Marker(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "LCRT", "~ Choose Marker ~", showName = false, showEditorId = true, showFormId = true)
-    if selection > -1
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "LCRT", selection)
-        string formId = ConsoleSearch.GetResultFormID(result)
-        Debug.MessageBox(formId)
-        Form theMarker = FormHelper.HexToForm(formId)
-        Debug.MessageBox(theMarker)
-        ObjectReference markerInstance = theMarker as ObjectReference
-        Debug.MessageBox(markerInstance)
-        ; Debug.MessageBox("Try casting the fork spell!")
-        ; PlayerRef.AddSpell(Search_Placement_Spell)
-        ; PlayerRef.EquipSpell(Search_Placement_Spell, 0)
-        ; PlayerRef.EquipSpell(Search_Placement_Spell, 1)
-        ; ObjectToPlace = FormHelper.HexToForm(formId)
-    endIf
-endFunction
+; function ShowCategory_Marker(int searchResults)
+;     int selection = ShowSearchResultChooser(searchResults, "LCRT", "~ Choose Marker ~", showName = false, showEditorId = true, showFormId = true)
+;     if selection > -1
+;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, "LCRT", selection)
+;         string formId = ConsoleSearch.GetResultFormID(result)
+;         Debug.MessageBox(formId)
+;         Form theMarker = FormHelper.HexToForm(formId)
+;         Debug.MessageBox(theMarker)
+;         ObjectReference markerInstance = theMarker as ObjectReference
+;         Debug.MessageBox(markerInstance)
+;         ; Debug.MessageBox("Try casting the fork spell!")
+;         ; PlayerRef.AddSpell(Search_Placement_Spell)
+;         ; PlayerRef.EquipSpell(Search_Placement_Spell, 0)
+;         ; PlayerRef.EquipSpell(Search_Placement_Spell, 1)
+;         ; ObjectToPlace = FormHelper.HexToForm(formId)
+;     endIf
+; endFunction
 
-function ShowCategory_Spell(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "SPEL", "~ ChooseSpell ~", showName = true, showEditorId = true, showFormId = true, option1 = "[View All Spells]")
-    if selection == -2
-        ; View All Spells
-        RemoveAllSpells(ItemAndSpellStorage)
-        AddAllSpellsToItemAndSpellStorage(searchResults)
-        ShowSpellTradingMenu()
+; function ShowCategory_Spell(int searchResults)
+;     int selection = ShowSearchResultChooser(searchResults, "SPEL", "~ ChooseSpell ~", showName = true, showEditorId = true, showFormId = true, option1 = "[View All Spells]")
+;     if selection == -2
+;         ; View All Spells
+;         RemoveAllSpells(ItemAndSpellStorage)
+;         AddAllSpellsToItemAndSpellStorage(searchResults)
+;         ShowSpellTradingMenu()
 
-    elseIf selection > -1
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "SPEL", selection)
-        string editorId = ConsoleSearch.GetResultEditorID(result)
-        string formId = ConsoleSearch.GetResultFormID(result)
-        Spell theSpell = FormHelper.HexToForm(formId) as Spell
-        PlayerRef.AddSpell(theSpell)
-        Debug.MessageBox("Added " + theSpell.GetName() + " the player")
-    endIf
-endFunction
+;     elseIf selection > -1
+;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, "SPEL", selection)
+;         string editorId = ConsoleSearch.GetResultEditorID(result)
+;         string formId = ConsoleSearch.GetResultFormID(result)
+;         Spell theSpell = FormHelper.HexToForm(formId) as Spell
+;         PlayerRef.AddSpell(theSpell)
+;         Debug.MessageBox("Added " + theSpell.GetName() + " the player")
+;     endIf
+; endFunction
 
-function ShowCategory_ImageSpaceModifier(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "IMAD", "~ Choose Image Space Modifier to Preview ~", showName = true, showEditorId = true, showFormId = true)
-    if selection > -1
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "IMAD", selection)
-        string editorId = ConsoleSearch.GetResultEditorID(result)
-        string formId = ConsoleSearch.GetResultFormID(result)
-        ImageSpaceModifier theImad = FormHelper.HexToForm(formId) as ImageSpaceModifier
-        theImad.Apply(1.0)
-        Debug.MessageBox("Applied " + editorId)
-    endIf
-endFunction
+; function ShowCategory_ImageSpaceModifier(int searchResults)
+;     int selection = ShowSearchResultChooser(searchResults, "IMAD", "~ Choose Image Space Modifier to Preview ~", showName = true, showEditorId = true, showFormId = true)
+;     if selection > -1
+;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, "IMAD", selection)
+;         string editorId = ConsoleSearch.GetResultEditorID(result)
+;         string formId = ConsoleSearch.GetResultFormID(result)
+;         ImageSpaceModifier theImad = FormHelper.HexToForm(formId) as ImageSpaceModifier
+;         theImad.Apply(1.0)
+;         Debug.MessageBox("Applied " + editorId)
+;     endIf
+; endFunction
 
-function ShowCategory_Message(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "MESG", "~ Choose Message to Show ~", showName = true, showEditorId = true, showFormId = true)
-    if selection > -1
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "MESG", selection)
-        string editorId = ConsoleSearch.GetResultEditorID(result)
-        string formId = ConsoleSearch.GetResultFormID(result)
-        Message theMessage = FormHelper.HexToForm(formId) as Message
-        theMessage.Show()
-    endIf
-endFunction
+; function ShowCategory_Message(int searchResults)
+;     int selection = ShowSearchResultChooser(searchResults, "MESG", "~ Choose Message to Show ~", showName = true, showEditorId = true, showFormId = true)
+;     if selection > -1
+;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, "MESG", selection)
+;         string editorId = ConsoleSearch.GetResultEditorID(result)
+;         string formId = ConsoleSearch.GetResultFormID(result)
+;         Message theMessage = FormHelper.HexToForm(formId) as Message
+;         theMessage.Show()
+;     endIf
+; endFunction
 
-function ShowCategory_Shout(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "SHOU", "~ Choose Shout ~", showName = true, showEditorId = true, showFormId = true)
-    if selection > -1
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "SHOU", selection)
-        string editorId = ConsoleSearch.GetResultEditorID(result)
-        string formId = ConsoleSearch.GetResultFormID(result)
-        Shout theShout = FormHelper.HexToForm(formId) as Shout
-        int i = 0
-        bool loop = true
-        while loop
-            WordOfPower word = theShout.GetNthWordOfPower(i)
-            if word
-                Game.TeachWord(word)
-                Game.UnlockWord(word)
-            else
-                loop = false
-            endIf
-            i += 1
-        endWhile
-        PlayerRef.AddShout(theShout)
-        Debug.MessageBox("Taught player " + theShout.GetName())
-    endIf
-    PlayerRef.ModActorValue("DragonSouls", 13)
-endFunction
+; function ShowCategory_Shout(int searchResults)
+;     int selection = ShowSearchResultChooser(searchResults, "SHOU", "~ Choose Shout ~", showName = true, showEditorId = true, showFormId = true)
+;     if selection > -1
+;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, "SHOU", selection)
+;         string editorId = ConsoleSearch.GetResultEditorID(result)
+;         string formId = ConsoleSearch.GetResultFormID(result)
+;         Shout theShout = FormHelper.HexToForm(formId) as Shout
+;         int i = 0
+;         bool loop = true
+;         while loop
+;             WordOfPower word = theShout.GetNthWordOfPower(i)
+;             if word
+;                 Game.TeachWord(word)
+;                 Game.UnlockWord(word)
+;             else
+;                 loop = false
+;             endIf
+;             i += 1
+;         endWhile
+;         PlayerRef.AddShout(theShout)
+;         Debug.MessageBox("Taught player " + theShout.GetName())
+;     endIf
+;     PlayerRef.ModActorValue("DragonSouls", 13)
+; endFunction
 
-function ShowCategory_WordOfPower(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "WOOP", "~ Choose Word of Power ~", showName = true, showEditorId = true, showFormId = true)
-    if selection > -1
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "WOOP", selection)
-        string editorId = ConsoleSearch.GetResultEditorID(result)
-        string formId = ConsoleSearch.GetResultFormID(result)
-        WordOfPower theWord = FormHelper.HexToForm(formId) as WordOfPower
-        Game.TeachWord(theWord)
-        Debug.MessageBox("Player has now learned the word " + theWord.GetName())
-    endIf
-endFunction
+; function ShowCategory_WordOfPower(int searchResults)
+;     int selection = ShowSearchResultChooser(searchResults, "WOOP", "~ Choose Word of Power ~", showName = true, showEditorId = true, showFormId = true)
+;     if selection > -1
+;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, "WOOP", selection)
+;         string editorId = ConsoleSearch.GetResultEditorID(result)
+;         string formId = ConsoleSearch.GetResultFormID(result)
+;         WordOfPower theWord = FormHelper.HexToForm(formId) as WordOfPower
+;         Game.TeachWord(theWord)
+;         Debug.MessageBox("Player has now learned the word " + theWord.GetName())
+;     endIf
+; endFunction
 
-function ShowCategory_Idle(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "IDLE", "~ Choose Idle to Play ~", showName = false, showEditorId = true, showFormId = true)
-    if selection > -1
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "IDLE", selection)
-        string editorId = ConsoleSearch.GetResultEditorID(result)
-        string formId = ConsoleSearch.GetResultFormID(result)
-        Idle theIdle = FormHelper.HexToForm(formId) as Idle
+; function ShowCategory_Idle(int searchResults)
+;     int selection = ShowSearchResultChooser(searchResults, "IDLE", "~ Choose Idle to Play ~", showName = false, showEditorId = true, showFormId = true)
+;     if selection > -1
+;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, "IDLE", selection)
+;         string editorId = ConsoleSearch.GetResultEditorID(result)
+;         string formId = ConsoleSearch.GetResultFormID(result)
+;         Idle theIdle = FormHelper.HexToForm(formId) as Idle
 
-        Actor cursorActor = Game.GetCurrentCrosshairRef() as Actor
+;         Actor cursorActor = Game.GetCurrentCrosshairRef() as Actor
 
-        if cursorActor
-            int listOptions = JArray.object()
-            JArray.addStr(listOptions, "[" + editorId + "]")
-            JArray.addStr(listOptions, "Player Play Idle")
-            JArray.addStr(listOptions, "NPC Play Idle")
-            string idleAction = GetUserSelection(JArray.asStringArray(listOptions))
-            if idleAction == "Player Play Idle"
-                PlayerRef.PlayIdle(theIdle)
-            elseIf idleAction == "NPC Play Idle"
-                Debug.SendAnimationEvent(cursorActor, editorId)
-            endIf
-        else
-            PlayerRef.PlayIdle(theIdle)
-        endIf
-    endIf
-endFunction
+;         if cursorActor
+;             int listOptions = JArray.object()
+;             JArray.addStr(listOptions, "[" + editorId + "]")
+;             JArray.addStr(listOptions, "Player Play Idle")
+;             JArray.addStr(listOptions, "NPC Play Idle")
+;             string idleAction = GetUserSelection(JArray.asStringArray(listOptions))
+;             if idleAction == "Player Play Idle"
+;                 PlayerRef.PlayIdle(theIdle)
+;             elseIf idleAction == "NPC Play Idle"
+;                 Debug.SendAnimationEvent(cursorActor, editorId)
+;             endIf
+;         else
+;             PlayerRef.PlayIdle(theIdle)
+;         endIf
+;     endIf
+; endFunction
 
-function ShowCategory_Dialogue(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "DIAL", "~ Choose Dialogue Topic ~", showName = false, showEditorId = true, showFormId = false)
-    if selection > -1
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "DIAL", selection)
-        string editorId = ConsoleSearch.GetResultEditorID(result)
-        string formId = ConsoleSearch.GetResultFormID(result)
+; function ShowCategory_Dialogue(int searchResults)
+;     int selection = ShowSearchResultChooser(searchResults, "DIAL", "~ Choose Dialogue Topic ~", showName = false, showEditorId = true, showFormId = false)
+;     if selection > -1
+;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, "DIAL", selection)
+;         string editorId = ConsoleSearch.GetResultEditorID(result)
+;         string formId = ConsoleSearch.GetResultFormID(result)
 
-        Actor cursorActor = Game.GetCurrentCrosshairRef() as Actor
+;         Actor cursorActor = Game.GetCurrentCrosshairRef() as Actor
 
-        if cursorActor
-            ConsoleUtil.SetSelectedReference(cursorActor)
-            Debug.MessageBox(cursorActor.GetActorBase().GetName() + " say " + editorId)
-        else
-            Debug.MessageBox("say " + editorId)
-            ConsoleUtil.ExecuteCommand("say " + editorId)
-        endIf
-    endIf
-endFunction
+;         if cursorActor
+;             ConsoleUtil.SetSelectedReference(cursorActor)
+;             Debug.MessageBox(cursorActor.GetActorBase().GetName() + " say " + editorId)
+;         else
+;             Debug.MessageBox("say " + editorId)
+;             ConsoleUtil.ExecuteCommand("say " + editorId)
+;         endIf
+;     endIf
+; endFunction
 
-; TODO
-function ShowCategory_SoulGem(int searchResults)
-    int selection = ShowSearchResultChooser(searchResults, "SLGM", "~ Choose Soul Gem ~", showName = false, showEditorId = true, showFormId = true)
-    if selection > -1
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, "SLGM", selection)
-        string editorId = ConsoleSearch.GetResultEditorID(result)
-        string formId = ConsoleSearch.GetResultFormID(result)
-        Idle theIdle = FormHelper.HexToForm(formId) as Idle
-    endIf
-endFunction
+; ; TODO
+; function ShowCategory_SoulGem(int searchResults)
+;     int selection = ShowSearchResultChooser(searchResults, "SLGM", "~ Choose Soul Gem ~", showName = false, showEditorId = true, showFormId = true)
+;     if selection > -1
+;         int result = ConsoleSearch.GetNthResultInCategory(searchResults, "SLGM", selection)
+;         string editorId = ConsoleSearch.GetResultEditorID(result)
+;         string formId = ConsoleSearch.GetResultFormID(result)
+;         Idle theIdle = FormHelper.HexToForm(formId) as Idle
+;     endIf
+; endFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Weapon Types
@@ -905,162 +905,162 @@ endFunction
 ; Click on option 2:  -3
 ; Click on option 3:  -4
 int function ShowSearchResultChooser(int searchResults, string category, string header = "", bool showFilter = true, string filter = "", bool showPluginFilter = true, string pluginFilter = "", string option1 = "", string option2 = "", string option3 = "", bool showName = true, bool showFormId = true, bool showEditorId = false)
-    int optionsToShow = JArray.object()
+    ; int optionsToShow = JArray.object()
 
-    UIListMenu listMenu = UIExtensions.GetMenu("UIListMenu") as UIListMenu
+    ; UIListMenu listMenu = UIExtensions.GetMenu("UIListMenu") as UIListMenu
 
-    int currentIndex      = 0
-    int headerIndex       = -1
-    int option1Index      = -1
-    int option2Index      = -1
-    int option3Index      = -1
-    int filterIndex       = -1
-    int pluginFilterIndex = -1
+    ; int currentIndex      = 0
+    ; int headerIndex       = -1
+    ; int option1Index      = -1
+    ; int option2Index      = -1
+    ; int option3Index      = -1
+    ; int filterIndex       = -1
+    ; int pluginFilterIndex = -1
 
-    if header
-        listMenu.AddEntryItem(header)
-        headerIndex = currentIndex
-        currentIndex += 1
-    endIf
-    if option1
-        listMenu.AddEntryItem(option1)
-        option1Index = currentIndex
-        currentIndex += 1
-    endIf
-    if option2
-        listMenu.AddEntryItem(option2)
-        option2Index = currentIndex
-        currentIndex += 1
-    endIf
-    if option3
-        listMenu.AddEntryItem(option3)
-        option3Index = currentIndex
-        currentIndex += 1
-    endIf
-    if showFilter
-        if filter
-            listMenu.AddEntryItem("[\"" + filter + "\"]")
-        else
-            listMenu.AddEntryItem("[Filter List]")
-        endIf
-        filterIndex = currentIndex
-        currentIndex += 1
-    endIf
-    if showPluginFilter && ! pluginFilter
-        if pluginFilter
-            listMenu.AddEntryItem("[" + pluginFilter + "]")
-        else
-            listMenu.AddEntryItem("[Filter by Plugin]")
-        endIf
-        pluginFilterIndex = currentIndex
-        currentIndex += 1
-    endIf
+    ; if header
+    ;     listMenu.AddEntryItem(header)
+    ;     headerIndex = currentIndex
+    ;     currentIndex += 1
+    ; endIf
+    ; if option1
+    ;     listMenu.AddEntryItem(option1)
+    ;     option1Index = currentIndex
+    ;     currentIndex += 1
+    ; endIf
+    ; if option2
+    ;     listMenu.AddEntryItem(option2)
+    ;     option2Index = currentIndex
+    ;     currentIndex += 1
+    ; endIf
+    ; if option3
+    ;     listMenu.AddEntryItem(option3)
+    ;     option3Index = currentIndex
+    ;     currentIndex += 1
+    ; endIf
+    ; if showFilter
+    ;     if filter
+    ;         listMenu.AddEntryItem("[\"" + filter + "\"]")
+    ;     else
+    ;         listMenu.AddEntryItem("[Filter List]")
+    ;     endIf
+    ;     filterIndex = currentIndex
+    ;     currentIndex += 1
+    ; endIf
+    ; if showPluginFilter && ! pluginFilter
+    ;     if pluginFilter
+    ;         listMenu.AddEntryItem("[" + pluginFilter + "]")
+    ;     else
+    ;         listMenu.AddEntryItem("[Filter by Plugin]")
+    ;     endIf
+    ;     pluginFilterIndex = currentIndex
+    ;     currentIndex += 1
+    ; endIf
 
-    int count = ConsoleSearch.GetResultCategoryCount(searchResults, category)
+    ; int count = ConsoleSearch.GetResultCategoryCount(searchResults, category)
 
-    int selectionIndexToNthIndex = JIntMap.object()
-    JValue.retain(selectionIndexToNthIndex)
+    ; int selectionIndexToNthIndex = JIntMap.object()
+    ; JValue.retain(selectionIndexToNthIndex)
 
-    int itemIndex = 0
-    int i = 0
-    while i < count
-        int result = ConsoleSearch.GetNthResultInCategory(searchResults, category, i)
-        string name = ConsoleSearch.GetResultName(result)
-        string formId = ConsoleSearch.GetResultFormID(result)
-        string editorId = ConsoleSearch.GetResultEditorID(result)
-        string prefix = ""
-        string text = ""
-        if showName
-            text += name
-            prefix = " "
-        endIf
-        if showEditorId
-            text += prefix + editorId
-            prefix = " "
-        endIf
-        if showFormId
-            text += prefix + "(" + formId + ")"
-        endIf
+    ; int itemIndex = 0
+    ; int i = 0
+    ; while i < count
+    ;     int result = ConsoleSearch.GetNthResultInCategory(searchResults, category, i)
+    ;     string name = ConsoleSearch.GetResultName(result)
+    ;     string formId = ConsoleSearch.GetResultFormID(result)
+    ;     string editorId = ConsoleSearch.GetResultEditorID(result)
+    ;     string prefix = ""
+    ;     string text = ""
+    ;     if showName
+    ;         text += name
+    ;         prefix = " "
+    ;     endIf
+    ;     if showEditorId
+    ;         text += prefix + editorId
+    ;         prefix = " "
+    ;     endIf
+    ;     if showFormId
+    ;         text += prefix + "(" + formId + ")"
+    ;     endIf
 
-        if ! filter || StringUtil.Find(name + editorId + formId, filter) > -1
-            if ! pluginFilter || FormHelper.HexToModName(formId) == pluginFilter
-                JArray.addStr(optionsToShow, text)
-                listMenu.AddEntryItem(text)
-                JIntMap.setInt(selectionIndexToNthIndex, itemIndex, i)
-                itemIndex += 1
-            endIf
-        endIf
-        i += 1
-    endWhile
+    ;     if ! filter || StringUtil.Find(name + editorId + formId, filter) > -1
+    ;         if ! pluginFilter || FormHelper.HexToModName(formId) == pluginFilter
+    ;             JArray.addStr(optionsToShow, text)
+    ;             listMenu.AddEntryItem(text)
+    ;             JIntMap.setInt(selectionIndexToNthIndex, itemIndex, i)
+    ;             itemIndex += 1
+    ;         endIf
+    ;     endIf
+    ;     i += 1
+    ; endWhile
 
-    listMenu.OpenMenu()
+    ; listMenu.OpenMenu()
 
-    int selection = listMenu.GetResultInt()
+    ; int selection = listMenu.GetResultInt()
 
-    if selection > -1
+    ; if selection > -1
 
-        if showFilter && selection == filterIndex
-            JValue.release(selectionIndexToNthIndex)
-            return ShowSearchResultChooser(searchResults, category, \
-                header           = header, \
-                showFilter       = showFilter, \
-                filter           = GetUserInput(), \
-                showPluginFilter = showPluginFilter, \
-                pluginFilter     = pluginFilter, \
-                option1          = option1, \
-                option2          = option2, \
-                option3          = option3, \
-                showName         = showName, \
-                showFormId       = showFormId, \
-                showEditorId     = showEditorId)
-        elseIf showPluginFilter && selection == pluginFilterIndex
-            JValue.release(selectionIndexToNthIndex)
-            return ShowSearchResultChooser(searchResults, category, \
-                header           = header, \
-                showFilter       = showFilter, \
-                filter           = filter, \
-                showPluginFilter = showPluginFilter, \
-                pluginFilter     = GetUserInput(), \
-                option1          = option1, \
-                option2          = option2, \
-                option3          = option3, \
-                showName         = showName, \
-                showFormId       = showFormId, \
-                showEditorId     = showEditorId)
-        else
-            ; Click on header:    -1
-            ; Click on option 1:  -2
-            ; Click on option 2:  -3
-            ; Click on option 3:  -4
-            if selection == headerIndex
-                return -1
-            elseIf selection == option1Index
-                return -2
-            elseIf selection == option2Index
-                return -3
-            elseIf selection == option3Index
-                return -4
-            else
-                ; Return the ACTUAL INDEX of the provided collection
-                int potentiallyFilteredItemIndex = selection - currentIndex
-                int originalIndex = JIntMap.getInt(selectionIndexToNthIndex, potentiallyFilteredItemIndex)
-                JValue.release(selectionIndexToNthIndex)
-                return originalIndex
-            endIf
-        endIf
-    endIf
+    ;     if showFilter && selection == filterIndex
+    ;         JValue.release(selectionIndexToNthIndex)
+    ;         return ShowSearchResultChooser(searchResults, category, \
+    ;             header           = header, \
+    ;             showFilter       = showFilter, \
+    ;             filter           = GetUserInput(), \
+    ;             showPluginFilter = showPluginFilter, \
+    ;             pluginFilter     = pluginFilter, \
+    ;             option1          = option1, \
+    ;             option2          = option2, \
+    ;             option3          = option3, \
+    ;             showName         = showName, \
+    ;             showFormId       = showFormId, \
+    ;             showEditorId     = showEditorId)
+    ;     elseIf showPluginFilter && selection == pluginFilterIndex
+    ;         JValue.release(selectionIndexToNthIndex)
+    ;         return ShowSearchResultChooser(searchResults, category, \
+    ;             header           = header, \
+    ;             showFilter       = showFilter, \
+    ;             filter           = filter, \
+    ;             showPluginFilter = showPluginFilter, \
+    ;             pluginFilter     = GetUserInput(), \
+    ;             option1          = option1, \
+    ;             option2          = option2, \
+    ;             option3          = option3, \
+    ;             showName         = showName, \
+    ;             showFormId       = showFormId, \
+    ;             showEditorId     = showEditorId)
+    ;     else
+    ;         ; Click on header:    -1
+    ;         ; Click on option 1:  -2
+    ;         ; Click on option 2:  -3
+    ;         ; Click on option 3:  -4
+    ;         if selection == headerIndex
+    ;             return -1
+    ;         elseIf selection == option1Index
+    ;             return -2
+    ;         elseIf selection == option2Index
+    ;             return -3
+    ;         elseIf selection == option3Index
+    ;             return -4
+    ;         else
+    ;             ; Return the ACTUAL INDEX of the provided collection
+    ;             int potentiallyFilteredItemIndex = selection - currentIndex
+    ;             int originalIndex = JIntMap.getInt(selectionIndexToNthIndex, potentiallyFilteredItemIndex)
+    ;             JValue.release(selectionIndexToNthIndex)
+    ;             return originalIndex
+    ;         endIf
+    ;     endIf
+    ; endIf
 endFunction
 
 int function ChooseEnchantment()
-    string enchantmentQuery = GetUserInput()
-    if enchantmentQuery
-        int enchantmentSearchResults = ConsoleSearch.ExecuteSearch(enchantmentQuery)
-        int enchantmentIndex = ShowSearchResultChooser(enchantmentSearchResults, "ENCH", "~ Choose Enchantment to Apply ~")
-        if enchantmentIndex > -1
-            int enchantmentResult = ConsoleSearch.GetNthResultInCategory(enchantmentSearchResults, "ENCH", enchantmentIndex)
-            return enchantmentResult
-        endIf
-    endIf
+    ; string enchantmentQuery = GetUserInput()
+    ; if enchantmentQuery
+    ;     int enchantmentSearchResults = ConsoleSearch.ExecuteSearch(enchantmentQuery)
+    ;     int enchantmentIndex = ShowSearchResultChooser(enchantmentSearchResults, "ENCH", "~ Choose Enchantment to Apply ~")
+    ;     if enchantmentIndex > -1
+    ;         int enchantmentResult = ConsoleSearch.GetNthResultInCategory(enchantmentSearchResults, "ENCH", enchantmentIndex)
+    ;         return enchantmentResult
+    ;     endIf
+    ; endIf
 endFunction
 
 int function ChooseNthEnchantmentMagicEffect(Enchantment theEnchanment)
@@ -1146,21 +1146,21 @@ Actor       property FakePlayerForSpellUI auto
 UIMagicMenu property MagicMenu            auto
 
 function ShowInventoryViewForCategory(int searchResults, string category)
-    ResetInventoryView()
-    int count = ConsoleSearch.GetResultCategoryCount(searchResults, category)
-    int i = 0
-    while i < count
-        int item = ConsoleSearch.GetNthResultInCategory(searchResults, category, i)
-        string formId = ConsoleSearch.GetResultFormID(item)
-        Form theForm = FormHelper.HexToForm(formId)
-        if theForm.GetType() == 42 || theForm.GetType() == 52 ; AMMO or SLGM
-            AddToInventoryView(theForm, 50)
-        else
-            AddToInventoryView(theForm)
-        endIf
-        i += 1
-    endWhile
-    ShowInventoryView()
+    ; ResetInventoryView()
+    ; int count = ConsoleSearch.GetResultCategoryCount(searchResults, category)
+    ; int i = 0
+    ; while i < count
+    ;     int item = ConsoleSearch.GetNthResultInCategory(searchResults, category, i)
+    ;     string formId = ConsoleSearch.GetResultFormID(item)
+    ;     Form theForm = FormHelper.HexToForm(formId)
+    ;     if theForm.GetType() == 42 || theForm.GetType() == 52 ; AMMO or SLGM
+    ;         AddToInventoryView(theForm, 50)
+    ;     else
+    ;         AddToInventoryView(theForm)
+    ;     endIf
+    ;     i += 1
+    ; endWhile
+    ; ShowInventoryView()
 endFunction
 
 function ResetInventoryView()
@@ -1186,15 +1186,15 @@ function RemoveAllSpells(actor theActor)
 endFunction
 
 function AddAllSpellsToItemAndSpellStorage(int searchResults)
-    int spellCount = ConsoleSearch.GetResultCategoryCount(searchResults, "SPEL")
-    int i = 0 
-    while i < spellCount
-        int spellResult = ConsoleSearch.GetNthResultInCategory(searchResults, "SPEL", i)
-        string formId = ConsoleSearch.GetResultFormID(spellResult)
-        Spell theSpell = FormHelper.HexToForm(formId) as Spell
-        ItemAndSpellStorage.AddSpell(theSpell)
-        i += 1
-    endWhile
+    ; int spellCount = ConsoleSearch.GetResultCategoryCount(searchResults, "SPEL")
+    ; int i = 0 
+    ; while i < spellCount
+    ;     int spellResult = ConsoleSearch.GetNthResultInCategory(searchResults, "SPEL", i)
+    ;     string formId = ConsoleSearch.GetResultFormID(spellResult)
+    ;     Spell theSpell = FormHelper.HexToForm(formId) as Spell
+    ;     ItemAndSpellStorage.AddSpell(theSpell)
+    ;     i += 1
+    ; endWhile
 endFunction
 
 function ShowSpellTradingMenu()

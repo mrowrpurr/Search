@@ -6,10 +6,11 @@ event OnProviderInit()
     ProviderName = "ConsoleSearch"
 endEvent
 
-int function PerformSearch(string query, int storeResults)
+int function PerformSearch(string query, int resultSet)
     int consoleSearchResults = ConsoleSearch.ExecuteSearch(query)
     JValue.retain(consoleSearchResults)
     string[] recordTypes = ConsoleSearch.GetResultRecordTypes(consoleSearchResults)
+    Debug.MessageBox(recordTypes)
     int i = 0
     while i < recordTypes.Length
         string recordType = recordTypes[i]
@@ -28,9 +29,10 @@ int function PerformSearch(string query, int storeResults)
                 text = formId
             endIf
             AddSearchResult(                                     \
-                storeResults,                                    \
+                resultSet,                                       \
                 category = GetCategoryForRecordType(recordType), \
                 text     = text,                                 \
+                name     = name,                                 \
                 formId   = formId,                               \
                 editorId = editorId                              \
             )
@@ -40,7 +42,7 @@ int function PerformSearch(string query, int storeResults)
     endWhile
 
     JValue.release(consoleSearchResults)
-    return storeResults
+    return resultSet
 endFunction
 
 string function GetCategoryForRecordType(string recordType)
