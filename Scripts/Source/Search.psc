@@ -40,14 +40,30 @@ int function GetSearchResultHistory() global
     return history
 endFunction
 
-int function ExecuteQuery(string query, float timeout = 5.0) global
+function ClearSearchResultHistory() global
+    JArray.clear(GetSearchResultHistory())
+endFunction
+
+int function ExecuteQuery(string query, float timeout = 5.0, bool autoLoadConfig = true) global
+    if autoLoadConfig
+        ; Load Search script configuration from disk
+        EnsureConfig()
+    endIf
+
     ; Get all of the providers to search
-    EnsureConfig()
     string[] providerNames = GetSearchProviderNames()
+
+    ; Object representing the search results for this query at this time
+    int searchResults = JMap.object()
+    JArray.addObj(GetSearchResultHistory(), searchResults)
+
+    ; Store info about this query's total runtime (across all providers)
+    float startTime = Utility.GetCurrentRealTime()
+    JMap.setFlt(searchResults, "startTime", startTime)
 
     ; Store the results from each searched provider
     int providerResults = JArray.object()
-    JArray.addObj(GetSearchResultHistory(), providerResults)
+    JMap.setObj(searchResults, "results", providerResults)
 
     ; Send the search query event
     int searchEvent = ModEvent.Create("SearchQuery")
@@ -62,26 +78,38 @@ int function ExecuteQuery(string query, float timeout = 5.0) global
         Utility.WaitMenuMode(0.1)
     endWhile
 
-    return providerResults
+    ; Store info about this query's total runtime (across all providers)
+    float endTime = Utility.GetCurrentRealTime()
+    JMap.setFlt(searchResults, "endTime", endTime)
+    JMap.setFlt(searchResults, "duration", endTime - startTime)
+
+    JValue.writeToFile(searchResults, "Search ExecuteQuery Results " + query + ".json")
+
+    return searchResults
 endFunction
 
-int function NewSearchResultSet(string provider) global
+int function CreateResultSet(string provider) global
     int result = JMap.object()
     JMap.setStr(result, "provider", provider)
-    JMap.setObj(result, "results", JMap.object())
+    JMap.setObj(result, "resultsByCategory", JMap.object())
     return result
 endFunction
 
-function AddSearchResult(int results, string category, string displayText, int data) global
+function AddSearchResult(int resultSet, string provider, string category, string displayText, int data) global
+    int resultsByCategory = JMap.getObj(resultSet, "resultsByCategory")
+
     int result = JMap.object()
+    JMap.setStr(result, "provider", provider)
+    JMap.setStr(result, "category", category)
     JMap.setStr(result, "displayText", displayText)
     JMap.setObj(result, "data", data)
 
-    if JMap.hasKey(results, category)
-        JArray.addObj(JMap.getObj(results, category), result)
-    else
-        int categoryArray = JArray.object()
-        JArray.addObj(categoryArray, result)
-        JMap.setObj(results, category, categoryArray)
+    int categoryArray = JMap.getObj(resultsByCategory, category)
+
+    if ! categoryArray
+        categoryArray = JArray.object()
+        JMap.setObj(resultsByCategory, category, categoryArray)        
     endIf
+
+    JArray.addObj(categoryArray, result)
 endFunction
