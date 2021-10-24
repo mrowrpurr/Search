@@ -1,6 +1,7 @@
 {
     "search_providers": [
-        "Weather"
+        "Weather",
+        "ConsoleSearch"
     ],
     "keyboard_shortcuts": {
         "ui": {

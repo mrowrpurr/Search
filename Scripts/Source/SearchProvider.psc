@@ -25,11 +25,21 @@ string property ProviderName
     endFunction
 endProperty
 
+; Override to configure your Search Provider.
+;
+; Runs the first time your provider is initialized
+; and every time the game is loaded after that.
+event OnProviderInit()
+    ; Intended to be overriden
+endEvent
+
 event OnInit()
+    OnProviderInit()
     RegisterForModEvent("SearchQuery", "OnSearchQuery")
 endEvent
 
 event OnPlayerLoadGame()
+    OnProviderInit()
     RegisterForModEvent("SearchQuery", "OnSearchQuery")
 endEvent
 

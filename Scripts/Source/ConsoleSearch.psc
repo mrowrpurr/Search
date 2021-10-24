@@ -95,7 +95,7 @@ endFunction
 ;
 ; Uses the Skyrim ~ console. The ~ console will actually pop open while the Search runs.
 ;
-; You can optionally pass along a `category` name. The category names correspond to those you'll find
+; You can optionally pass along a `recordType` name. The recordType names correspond to those you'll find
 ; when using the `help` command in the Skyrim console, e.g. to filter for just NPCs, use `NPC_`
 ;
 ; If you want to filter down your results further, provide an additional `filter`.
@@ -103,34 +103,34 @@ endFunction
 ;
 ; This function returns an identifier representing the discovered test results.
 ;
-; To read the individual test results, see `GetResultCategories()` `GetResultCategoryCount()` `GetNthResultInCategory()`
+; To read the individual test results, see `GetResultRecordTypes()` `GetResultRecordTypeCount()` `GetNthResultOfRecordType()`
 ;
 ; ```
 ; int results = ConsoleConsoleSearch.Search("Hod")
 ;
-; string[] foundCategories = ConsoleConsoleSearch.GetResultCategories(results)
+; string[] foundRecordTypes = ConsoleConsoleSearch.GetResultRecordTypes(results)
 ;
-; int categoryIndex = 0
-; while categoryIndex < foundCategories.Length
-;   string category = foundCategories[categoryIndex]
+; int recordTypeIndex = 0
+; while recordTypeIndex < foundRecordTypes.Length
+;   string recordType = foundRecordTypes[recordTypeIndex]
 ;
-;   int countInCategory = ConsoleConsoleSearch.GetResultCategoryCount(results, category)
+;   int countInRecordType = ConsoleConsoleSearch.GetResultRecordTypeCount(results, recordType)
 ;   int i = 0
-;   while i < countInCategory
-;       int result = ConsoleConsoleSearch.GetNthResultInCategory(results, category, i)
+;   while i < countInRecordType
+;       int result = ConsoleConsoleSearch.GetNthResultOfRecordType(results, recordType, i)
 ;       
-;       Debug.Trace("Result name: " + ConsoleConsoleSearch.GetResultName(result))
-;       Debug.Trace("Result form ID: " + ConsoleConsoleSearch.GetResultFormID(result))
-;       Debug.Trace("Result editor ID: " + ConsoleConsoleSearch.GetResultEditorID(result))
+;       Debug.Trace("Result name: " + ConsoleConsoleSearch.GetRecordName(result))
+;       Debug.Trace("Result form ID: " + ConsoleConsoleSearch.GetRecordFormID(result))
+;       Debug.Trace("Result editor ID: " + ConsoleConsoleSearch.GetRecordEditorID(result))
 ;
 ;       i += 1
 ;   endWhile
 ;
-;   categoryIndex += 1
+;   recordTypeIndex += 1
 ; endWhile
 ;
 ; ```
-int function ExecuteSearch(string query, string category = "", string filter = "") global
+int function ExecuteSearch(string query, string recordType = "", string filter = "") global
     int results = JMap.object()
     string newline = StringUtil.AsChar(13) ; 10 is Line Feed, 13 is Carriage Return
     string text = Help(query)
@@ -146,7 +146,7 @@ int function ExecuteSearch(string query, string category = "", string filter = "
             int openSingleQuote = StringUtil.Find(line, "'")
             if openParens && closeParens && openSingleQuote
                 string type = StringUtil.Substring(line, 0, colon)
-                if type != "usage" && type != "filters" && (! category || type == category)
+                if type != "usage" && type != "filters" && (! recordType || type == recordType)
                     string editorId = ""
                     if (openParens - colon - 3) > 0
                         editorId = StringUtil.Substring(line, colon + 2, openParens - colon - 3)
@@ -175,51 +175,51 @@ int function ExecuteSearch(string query, string category = "", string filter = "
     return results
 endFunction
 
-; Gets a full list of all of categories of discovered results.
+; Gets a full list of all of recordTypes of discovered results.
 ; Provide the "`allResultsReference`" which is returned by the `Search()` function.
-string[] function GetResultCategories(int allResultsReference) global
+string[] function GetResultRecordTypes(int allResultsReference) global
     return JMap.allKeysPArray(allResultsReference)
 endFunction
 
-; Gets the count of all results discovered in the specified category.
+; Gets the count of all results discovered in the specified recordType.
 ; Provide the "`allResultsReference`" which is returned by the `Search()` function.
-int function GetResultCategoryCount(int allResultsReference, string category) global
-    int categoryArray = JMap.getObj(allResultsReference, category)
-    if categoryArray
-        return JArray.count(categoryArray)
+int function GetResultRecordTypeCount(int allResultsReference, string recordType) global
+    int recordTypeArray = JMap.getObj(allResultsReference, recordType)
+    if recordTypeArray
+        return JArray.count(recordTypeArray)
     else
         return 0
     endIf
 endFunction
 
-; Gets a reference to an individual search result in a specified category.
-; Use `GetResultCategoryCount()` to get the full count of individual search results in the category,
-; and then use `GetNthResultInCategory()` to get a result in that category using an array index.
+; Gets a reference to an individual search result in a specified recordType.
+; Use `GetResultRecordTypeCount()` to get the full count of individual search results in the recordType,
+; and then use `GetNthResultOfRecordType()` to get a result in that recordType using an array index.
 ; Provide the "`allResultsReference`" which is returned by the `Search()` function.
-int function GetNthResultInCategory(int allResultsReference, string category, int index) global
-    int categoryArray = JMap.getObj(allResultsReference, category)
-    if categoryArray
-        return JArray.getObj(categoryArray, index)
+int function GetNthResultOfRecordType(int allResultsReference, string recordType, int index) global
+    int recordTypeArray = JMap.getObj(allResultsReference, recordType)
+    if recordTypeArray
+        return JArray.getObj(recordTypeArray, index)
     else
         return 0
     endIf
 endFunction
 
 ; Get the Name of this result.
-; To get a result, see `GetNthResultInCategory`.
-string function GetResultName(int individualResultReference) global
+; To get a result, see `GetNthResultOfRecordType`.
+string function GetRecordName(int individualResultReference) global
     return JMap.getStr(individualResultReference, "name")
 endFunction
 
 ; Get the EditorID of this result.
-; To get a result, see `GetNthResultInCategory`.
-string function GetResultEditorID(int individualResultReference) global
+; To get a result, see `GetNthResultOfRecordType`.
+string function GetRecordEditorID(int individualResultReference) global
     return JMap.getStr(individualResultReference, "editorID")
 endFunction
 
 ; Get the FormID of this result.
-; To get a result, see `GetNthResultInCategory`.
-string function GetResultFormID(int individualResultReference) global
+; To get a result, see `GetNthResultOfRecordType`.
+string function GetRecordFormID(int individualResultReference) global
     return JMap.getStr(individualResultReference, "formID")
 endFunction
 
