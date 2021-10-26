@@ -10,7 +10,6 @@ int function PerformSearch(string query, int resultSet)
     int consoleSearchResults = ConsoleSearch.ExecuteSearch(query)
     JValue.retain(consoleSearchResults)
     string[] recordTypes = ConsoleSearch.GetResultRecordTypes(consoleSearchResults)
-    Debug.MessageBox(recordTypes)
     int i = 0
     while i < recordTypes.Length
         string recordType = recordTypes[i]

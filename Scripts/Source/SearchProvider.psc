@@ -36,7 +36,6 @@ endEvent
 event OnInit()
     OnProviderInit()
     RegisterForModEvent("SearchQuery_" + ProviderName, "OnSearchQuery")
-    Debug.MessageBox("Listening for '" + "SearchQuery_" + ProviderName + "'")
 endEvent
 
 event OnPlayerLoadGame()
@@ -67,7 +66,6 @@ endFunction
 
 ; Do not override this event. Use `PerformSearch()` instead.
 event OnSearchQuery(string query, int searchResultArray)
-    Debug.MessageBox("OnSearchQuery " + query + " " + ProviderName + " " + self)
     int resultSet = Search.CreateResultSet(ProviderName)
     JArray.addObj(searchResultArray, resultSet)
     

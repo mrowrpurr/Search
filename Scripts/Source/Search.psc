@@ -44,7 +44,7 @@ function ClearSearchResultHistory() global
     JArray.clear(GetSearchResultHistory())
 endFunction
 
-int function ExecuteQuery(string query, float timeout = 5.0, float waitInterval = 0.1, bool autoLoadConfig = true) global
+int function ExecuteQuery(string query, float timeout = 10.0, float waitInterval = 0.1, bool autoLoadConfig = true) global
     if autoLoadConfig
         ; Load Search script configuration from disk
         EnsureConfig()
@@ -52,7 +52,6 @@ int function ExecuteQuery(string query, float timeout = 5.0, float waitInterval 
 
     ; Get all of the providers to search
     string[] providerNames = GetSearchProviderNames()
-    Debug.MessageBox(providerNames)
 
     ; Object representing the search results for this query at this time
     int searchResults = JMap.object()
@@ -70,7 +69,6 @@ int function ExecuteQuery(string query, float timeout = 5.0, float waitInterval 
     int i = 0
     while i < providerNames.Length
         int searchEvent = ModEvent.Create("SearchQuery_" + providerNames[i])
-        Debug.MessageBox("'" + "SearchQuery_" + providerNames[i] + "'")
         ModEvent.PushString(searchEvent, query)
         ModEvent.PushInt(searchEvent, providerResults)
         ModEvent.Send(searchEvent)
@@ -80,10 +78,7 @@ int function ExecuteQuery(string query, float timeout = 5.0, float waitInterval 
     ; Wait for the search query responses... including checking if they are "done"...
     bool searchComplete = false
     float searchStartTime = Utility.GetCurrentRealTime()
-    while JArray.count(providerResults) < providerNames.Length \
-        && (Utility.GetCurrentRealTime() - searchStartTime) < timeout \
-        && ! searchComplete
-        Debug.MessageBox("Waiting for search results to be complete...")
+    while ! searchComplete && (Utility.GetCurrentRealTime() - searchStartTime) < timeout
         if JArray.count(providerResults) == providerNames.Length
             i = 0
             bool allDone = true
@@ -96,7 +91,6 @@ int function ExecuteQuery(string query, float timeout = 5.0, float waitInterval 
                 i += 1
             endWhile
             if allDone
-                Debug.MessageBox("All done, search complete")
                 searchComplete = true
             else
                 Utility.WaitMenuMode(waitInterval)
