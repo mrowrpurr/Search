@@ -45,8 +45,6 @@ function ClearSearchResultHistory() global
 endFunction
 
 int function ExecuteQuery(string query, float timeout = 5.0, float waitInterval = 0.1, bool autoLoadConfig = true) global
-    Debug.MessageBox("Execute Query???")
-
     if autoLoadConfig
         ; Load Search script configuration from disk
         EnsureConfig()
@@ -85,6 +83,7 @@ int function ExecuteQuery(string query, float timeout = 5.0, float waitInterval 
     while JArray.count(providerResults) < providerNames.Length \
         && (Utility.GetCurrentRealTime() - searchStartTime) < timeout \
         && ! searchComplete
+        Debug.MessageBox("Waiting for search results to be complete...")
         if JArray.count(providerResults) == providerNames.Length
             i = 0
             bool allDone = true
@@ -141,6 +140,4 @@ function AddSearchResult(int resultSet, string provider, string category, string
     endIf
 
     JArray.addObj(categoryArray, result)
-
-    Debug.MessageBox("Add Search Result to result set " + resultSet + " " + provider + " " + category + " " + displayText)
 endFunction

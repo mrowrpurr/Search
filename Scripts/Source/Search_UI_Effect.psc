@@ -5,7 +5,6 @@ Search_UI property API auto
 
 event OnEffectStart(Actor target, Actor caster)
     string query = Search_UI.GetUserInput()
-    Debug.MessageBox("Running Execute Query???")
     int results = Search.ExecuteQuery(query)
     Utility.WaitMenuMode(3)
     DisplayResults(results)
