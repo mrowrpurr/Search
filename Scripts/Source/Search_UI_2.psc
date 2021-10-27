@@ -1,6 +1,13 @@
 scriptName Search_UI_2
 {Version two of Search UI ~ the Extensible version!}
 
+
+; Action Types
+;
+; CategoryListAction
+; CategoryAction
+; IndividualResultAction
+
 function ShowSearch_Main(int searchResults) global
 
     ; "Armor (2)" "Armor" => 2
@@ -119,10 +126,11 @@ function ShowSearch_CategorySubmenu(int searchResults, string categoryName) glob
         if selection < resultOffset
             int selectedAction = GetCategoryAction(categoryName, categoryActionNames[selection])
             string eventName = JMap.getStr(selectedAction, "action")
-
-
-            ; string eventName, int searchResult
-            ; Search_Action_PlaceAtMe
+            int theEvent = ModEvent.Create("Search_Action_" + eventName)
+            ModEvent.PushString(theEvent, eventName)
+            ModEvent.PushInt(theEvent, searchResults)
+            ModEvent.PushString(theEvent, categoryName)
+            ModEvent.Send(theEvent)
         else
             int index = selection - resultOffset
             int searchResultSet = JArray.getObj(resultSetsForEachResult, index)

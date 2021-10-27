@@ -1,4 +1,4 @@
 {
-    "text": "[Spawn]",
-    "action": "PlaceAtMe"
+    "text": "[Spawn All]",
+    "action": "SpawnAll"
 }
