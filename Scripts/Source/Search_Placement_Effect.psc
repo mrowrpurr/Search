@@ -1,1 +1,0 @@
-Scriptname Search_Placement_Effect extends ActiveMagicEffect  

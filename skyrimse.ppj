@@ -10,17 +10,20 @@
     Package="false"
     Final="false">
     <Variables>
-        <!-- Set the name of your mod: -->
         <Variable Name="ModName" Value="Search" />
-        <!-- The folder where you store all of your mods -->
         <Variable Name="ModsFolder" Value="C:\Users\mrowr\Dropbox\Skyrim\Mods" />
-        <!-- Optional folder with additional source code for imports -->
         <Variable Name="ImportsFolder" Value="C:\Users\mrowr\Dropbox\Skyrim\Imports" />
     </Variables>
     <Imports>
+        <!-- Search Dependencies -->
+        <Import>@ModsFolder\Search Core\Scripts\Source</Import>
+        <Import>@ModsFolder\Search Providers\Scripts\Source</Import>
+        <!-- <Import>@ModsFolder\Search Actions\Scripts\Source</Import> -->
+
         <!-- Core Dependencies -->
-        <Import>@ImportsFolder\SKSE64\Scripts\Source</Import>
         <Import>@ModsFolder\Form Helper\Scripts\Source</Import>
+        <Import>@ModsFolder\UIExtensionsExtensions\Scripts\Source</Import>
+        <Import>@ImportsFolder\SKSE64\Scripts\Source</Import>
         <Import>@ImportsFolder\JContainers\Scripts\Source</Import>
 
         <!-- Optional -->
