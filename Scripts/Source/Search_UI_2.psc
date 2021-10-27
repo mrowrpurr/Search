@@ -1,13 +1,6 @@
 scriptName Search_UI_2
 {Version two of Search UI ~ the Extensible version!}
 
-
-; Action Types
-;
-; CategoryListAction
-; CategoryAction
-; IndividualResultAction
-
 function ShowSearch_Main(int searchResults) global
 
     ; "Armor (2)" "Armor" => 2
@@ -59,7 +52,7 @@ endFunction
 
 string[] function GetCategoryActionNames(string categoryName) global
     int actionNames = JArray.object()
-    int categoryActionConfigs = JValue.readFromDirectory("Data/Search/Categories/" + categoryName)
+    int categoryActionConfigs = JValue.readFromDirectory("Data/Search/Categories/" + categoryName + "/List")
     string[] configFiles = JMap.allKeysPArray(categoryActionConfigs)
     int i = 0
     while i < configFiles.Length
@@ -73,6 +66,24 @@ string[] function GetCategoryActionNames(string categoryName) global
 endFunction
 
 int function GetCategoryAction(string categoryName, string actionName) global
+    int categoryActionConfigs = JValue.readFromDirectory("Data/Search/Categories/" + categoryName + "/List")
+    if categoryActionConfigs
+        string[] configFiles = JMap.allKeysPArray(categoryActionConfigs)
+        int i = 0
+        while i < configFiles.Length
+            string filename = configFiles[i]
+            int actionConfig = JMap.getObj(categoryActionConfigs, filename)
+            string actionText = JMap.getStr(actionConfig, "text")
+            if actionText == actionName
+                return actionConfig
+            endIf
+            i += 1
+        endWhile
+    endIf
+endFunction
+
+string[] function GetCategoryResultActionNames(string categoryName) global
+    int actionNames = JArray.object()
     int categoryActionConfigs = JValue.readFromDirectory("Data/Search/Categories/" + categoryName)
     string[] configFiles = JMap.allKeysPArray(categoryActionConfigs)
     int i = 0
@@ -80,11 +91,27 @@ int function GetCategoryAction(string categoryName, string actionName) global
         string filename = configFiles[i]
         int actionConfig = JMap.getObj(categoryActionConfigs, filename)
         string actionText = JMap.getStr(actionConfig, "text")
-        if actionText == actionName
-            return actionConfig
-        endIf
+        JArray.addStr(actionNames, actionText)
         i += 1
     endWhile
+    return JArray.asStringArray(actionNames)
+endFunction
+
+int function GetCategoryResultAction(string categoryName, string actionName) global
+    int categoryActionConfigs = JValue.readFromDirectory("Data/Search/Categories/" + categoryName)
+    if categoryActionConfigs
+        string[] configFiles = JMap.allKeysPArray(categoryActionConfigs)
+        int i = 0
+        while i < configFiles.Length
+            string filename = configFiles[i]
+            int actionConfig = JMap.getObj(categoryActionConfigs, filename)
+            string actionText = JMap.getStr(actionConfig, "text")
+            if actionText == actionName
+                return actionConfig
+            endIf
+            i += 1
+        endWhile
+    endIf
 endFunction
 
 function ShowSearch_CategorySubmenu(int searchResults, string categoryName) global
@@ -130,16 +157,45 @@ function ShowSearch_CategorySubmenu(int searchResults, string categoryName) glob
             ModEvent.PushString(theEvent, eventName)
             ModEvent.PushInt(theEvent, searchResults)
             ModEvent.PushString(theEvent, categoryName)
+            ModEvent.PushInt(theEvent, 0)
+            ModEvent.PushInt(theEvent, 0)
             ModEvent.Send(theEvent)
         else
             int index = selection - resultOffset
             int searchResultSet = JArray.getObj(resultSetsForEachResult, index)
             int selectedResult = Search.GetNthCategoryResultForSearchResultSet(searchResultSet, categoryName, index)
             string selectedResultDisplayText = Search.GetResultDisplayText(selectedResult)
-            Debug.MessageBox("You selected: " + selectedResultDisplayText)
+            ShowSearch_IndividualResult(searchResults, categoryName, searchResultSet, selectedResult)
         endIF
     endIf
 
     JValue.release(resultSetsForEachResult)
 
+endFunction
+
+function ShowSearch_IndividualResult(int searchResults, string categoryName, int searchResultSet, int searchResult) global
+    string[] categoryResultActionNames = GetCategoryResultActionNames(categoryName)
+
+    UIListMenu listMenu = UIExtensions.GetMenu("UIListMenu") as UIListMenu
+
+    int i = 0
+    while i < categoryResultActionNames.Length
+        listMenu.AddEntryItem(categoryResultActionNames[i])
+        i += 1
+    endWhile
+
+    listMenu.OpenMenu()
+
+    int selection = listMenu.GetResultInt()
+    string selectedActionName = categoryResultActionNames[selection]
+    int selectedAction = GetCategoryResultAction(categoryName, selectedActionName)
+
+    string eventName = JMap.getStr(selectedAction, "action")
+    int theEvent = ModEvent.Create("Search_Action_" + eventName)
+    ModEvent.PushString(theEvent, eventName)
+    ModEvent.PushInt(theEvent, searchResults)
+    ModEvent.PushString(theEvent, categoryName)
+    ModEvent.PushInt(theEvent, searchResultSet)
+    ModEvent.PushInt(theEvent, searchResult)
+    ModEvent.Send(theEvent)
 endFunction

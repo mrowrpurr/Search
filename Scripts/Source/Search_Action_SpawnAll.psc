@@ -8,7 +8,7 @@ event OnPlayerLoadGame()
     RegisterForModEvent("Search_Action_SpawnAll", "OnSpawnAll")
 endEvent
 
-event OnSpawnAll(string eventName, int searchResults, string categoryName)
+event OnSpawnAll(string eventName, int searchResults, string categoryName, int _, int __)
     int searchResultSetCount = Search.GetSearchResultSetCount(searchResults)
     int i = 0
     while i < searchResultSetCount
