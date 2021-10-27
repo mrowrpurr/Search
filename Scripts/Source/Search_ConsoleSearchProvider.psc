@@ -1,10 +1,21 @@
 scriptName Search_ConsoleSearchProvider extends SearchProvider
 
-int _recordTypesToCategoryNames
-
 event OnProviderInit()
     ProviderName = "ConsoleSearch"
 endEvent
+
+string property RecordTypesToCategoryNamesFile = "recordTypeCategoryNames.json" autoReadonly
+string property RecordTypesToCategoryNamesPath = ".recordTypesToCategoryNames"  autoReadonly
+
+int property RecordTypesToCategoryNames
+    int function get()
+        int theRecordInventoryTypeNames = GetObject(RecordTypesToCategoryNamesPath)
+        if ! theRecordInventoryTypeNames
+            SetObject(RecordTypesToCategoryNamesPath, ReadConfigFile(RecordTypesToCategoryNamesFile))
+        endIf
+        return theRecordInventoryTypeNames
+    endFunction
+endProperty
 
 int function PerformSearch(string query, int resultSet)
     int consoleSearchResults = ConsoleSearch.ExecuteSearch(query)
@@ -45,12 +56,9 @@ int function PerformSearch(string query, int resultSet)
 endFunction
 
 string function GetCategoryForRecordType(string recordType)
-    if ! _recordTypesToCategoryNames
-        _recordTypesToCategoryNames = ReadConfigFile("recordTypeCategoryNames.json")
-    endIf
-    string categoryName = JMap.getStr(_recordTypesToCategoryNames, recordType)
+    string categoryName = JMap.getStr(RecordTypesToCategoryNames, recordType)
     if ! categoryName
-        categoryName = "UNKNOWN"
+        categoryName = "Unknown"
     endIf
     return categoryName
 endFunction

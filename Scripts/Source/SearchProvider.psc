@@ -89,3 +89,19 @@ function AddSearchResult(int resultSet, string category, string text, string nam
     JMap.setStr(resultData, "formId", formId)
     JMap.setStr(resultData, "editorId", editorId)
 endFunction
+
+function AddResultSetKeyword(int resultSet, string resultSetKeyword)
+    Search.AddResultSetKeyword(resultSet, resultSetKeyword)
+endFunction
+
+string function JDBPath(string path)
+    return ".search.providers." + ProviderName + path
+endFunction
+
+int function GetObject(string path)
+    return JDB.solveObj(JDBPath(path))
+endFunction
+
+function SetObject(string path, int objectRef)
+    JDB.solveObjSetter(JDBPath(path), objectRef, createMissingKeys = true)
+endFunction

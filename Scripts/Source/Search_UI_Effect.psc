@@ -6,14 +6,9 @@ Search_UI property API auto
 event OnEffectStart(Actor target, Actor caster)
     string query = Search_UI.GetUserInput()
     int results = Search.ExecuteQuery(query)
-    Utility.WaitMenuMode(3)
-    DisplayResults(results)
-endEvent
-
-function DisplayResults(int results)
     JValue.writeToFile(results, "SearchResults.json")
-    Debug.MessageBox("Wrote to SearchResults.json")
-endFunction
+    Search_UI_2.ShowSearch_Main(results)
+endEvent
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

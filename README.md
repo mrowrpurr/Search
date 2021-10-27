@@ -21,3 +21,4 @@ https://en.uesp.net/wiki/Skyrim_Mod:Mod_File_Format
 ### Not Started
 
 - `LCTN` Location - show in the list and in a popup if they are cleared
+- `GLOB` Global variables

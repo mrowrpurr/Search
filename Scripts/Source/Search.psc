@@ -114,7 +114,12 @@ int function CreateResultSet(string provider) global
     int result = JMap.object()
     JMap.setStr(result, "provider", provider)
     JMap.setObj(result, "resultsByCategory", JMap.object())
+    JMap.setObj(result, "keywords", JMap.object())
     return result
+endFunction
+
+function AddResultSetKeyword(int resultSet, string resultSetKeyword) global
+    JMap.setInt(JMap.getObj(resultSet, "keywords"), resultSetKeyword, 1)
 endFunction
 
 function AddSearchResult(int resultSet, string provider, string category, string displayText, int data) global
@@ -134,4 +139,38 @@ function AddSearchResult(int resultSet, string provider, string category, string
     endIf
 
     JArray.addObj(categoryArray, result)
+endFunction
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Result Set Functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+int function GetSearchResultSetCount(int searchResults) global
+    return JArray.count(JMap.getObj(searchResults, "Results"))
+endFunction
+
+int function GetNthSearchResultSet(int searchResults, int index) global
+    return JArray.getObj(JMap.getObj(searchResults, "Results"), index)
+endFunction
+
+string[] function GetCategoryNamesForSearchResultSet(int searchResultSet) global
+    return JMap.allKeysPArray(JMap.getObj(searchResultSet, "resultsByCategory"))
+endFunction
+
+int function GetCategoryResultCountForSearchResultSet(int searchResultSet, string categoryName) global
+    int resultsByCategory = JMap.getObj(searchResultSet, "resultsByCategory")
+    int resultCategoryResults = JMap.getObj(resultsByCategory, categoryName)
+    return JArray.count(resultCategoryResults)
+endFunction
+
+int function GetNthCategoryResultForSearchResultSet(int searchResultSet, string categoryName, int index) global
+    int resultsByCategory = JMap.getObj(searchResultSet, "resultsByCategory")
+    int resultCategoryResults = JMap.getObj(resultsByCategory, categoryName)
+    return JArray.getObj(resultCategoryResults, index)
+endFunction
+
+;;;
+
+string function GetResultDisplayText(int result) global
+    return JMap.getStr(result, "displayText")
 endFunction

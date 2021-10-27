@@ -1,0 +1,15 @@
+{
+    "ALCH": true,
+    "AMMO": true,
+    "ARMO": true,
+    "BOOK": true,
+    "FLOR": true,
+    "INGR": true,
+    "KEYM": true,
+    "MISC": true,
+    "NOTE": true,
+    "REFR": true,
+    "SCRL": true,
+    "SLGM": true,
+    "WEAP": true
+}
