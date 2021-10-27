@@ -50,17 +50,58 @@ function ShowSearch_Main(int searchResults) global
 
 endFunction
 
+string[] function GetCategoryActionNames(string categoryName) global
+    int actionNames = JArray.object()
+    int categoryActionConfigs = JValue.readFromDirectory("Data/Search/Categories/" + categoryName)
+    string[] configFiles = JMap.allKeysPArray(categoryActionConfigs)
+    int i = 0
+    while i < configFiles.Length
+        string filename = configFiles[i]
+        int actionConfig = JMap.getObj(categoryActionConfigs, filename)
+        string actionText = JMap.getStr(actionConfig, "text")
+        JArray.addStr(actionNames, actionText)
+        i += 1
+    endWhile
+    return JArray.asStringArray(actionNames)
+endFunction
+
+int function GetCategoryAction(string categoryName, string actionName) global
+    int categoryActionConfigs = JValue.readFromDirectory("Data/Search/Categories/" + categoryName)
+    string[] configFiles = JMap.allKeysPArray(categoryActionConfigs)
+    int i = 0
+    while i < configFiles.Length
+        string filename = configFiles[i]
+        int actionConfig = JMap.getObj(categoryActionConfigs, filename)
+        string actionText = JMap.getStr(actionConfig, "text")
+        if actionText == actionName
+            return actionConfig
+        endIf
+        i += 1
+    endWhile
+endFunction
+
 function ShowSearch_CategorySubmenu(int searchResults, string categoryName) global
+    string[] categoryActionNames = GetCategoryActionNames(categoryName)
 
     UIListMenu listMenu = UIExtensions.GetMenu("UIListMenu") as UIListMenu
 
-    int searchResultSetCount = Search.GetSearchResultSetCount(searchResults)
     int i = 0
+    while i < categoryActionNames.Length
+        listMenu.AddEntryItem(categoryActionNames[i])
+        i += 1
+    endWhile
+
+    int resultSetsForEachResult = JArray.object()
+    JValue.retain(resultSetsForEachResult)
+
+    int searchResultSetCount = Search.GetSearchResultSetCount(searchResults)
+    i = 0
     while i < searchResultSetCount
         int searchResultSet = Search.GetNthSearchResultSet(searchResults, i)
         int categoryResultCount = Search.GetCategoryResultCountForSearchResultSet(searchResultSet, categoryName)
         int j = 0
         while j < categoryResultCount
+            JArray.addObj(resultSetsForEachResult, searchResultSet)
             int result = Search.GetNthCategoryResultForSearchResultSet(searchResultSet, categoryName, j)
             string displayText = Search.GetResultDisplayText(result)
             listMenu.AddEntryItem(displayText)
@@ -70,5 +111,27 @@ function ShowSearch_CategorySubmenu(int searchResults, string categoryName) glob
     endWhile
 
     listMenu.OpenMenu()
+
+    int selection = listMenu.GetResultInt()
+    int resultOffset = categoryActionNames.Length
+
+    if selection > -1
+        if selection < resultOffset
+            int selectedAction = GetCategoryAction(categoryName, categoryActionNames[selection])
+            string eventName = JMap.getStr(selectedAction, "action")
+
+
+            ; string eventName, int searchResult
+            ; Search_Action_PlaceAtMe
+        else
+            int index = selection - resultOffset
+            int searchResultSet = JArray.getObj(resultSetsForEachResult, index)
+            int selectedResult = Search.GetNthCategoryResultForSearchResultSet(searchResultSet, categoryName, index)
+            string selectedResultDisplayText = Search.GetResultDisplayText(selectedResult)
+            Debug.MessageBox("You selected: " + selectedResultDisplayText)
+        endIF
+    endIf
+
+    JValue.release(resultSetsForEachResult)
 
 endFunction
