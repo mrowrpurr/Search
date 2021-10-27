@@ -1,1 +1,0 @@
-Scriptname Search_ActorReferenceSearchProvider extends ReferenceAlias  
