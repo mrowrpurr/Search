@@ -1,0 +1,4 @@
+{
+    "name": "[Set Active Weather]",
+    "action": "ChangeWeather"
+}
