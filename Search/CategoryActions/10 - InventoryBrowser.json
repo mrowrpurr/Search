@@ -1,0 +1,18 @@
+{
+    "text": "[Browse Items]",
+    "action": "InventoryBrowser",
+    "categories": [
+        "Potion",
+        "Ammo",
+        "Armor",
+        "Book",
+        "Flora",
+        "Ingredient",
+        "Key",
+        "Misc. Object",
+        "Note",
+        "Scroll",
+        "Soul Gem",
+        "Weapon"
+    ]
+}

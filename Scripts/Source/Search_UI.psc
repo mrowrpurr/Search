@@ -16,6 +16,7 @@ function ShowSearchPrompt() global
 endFunction
 
 function ShowSearchResultsCategoryList(int searchResults) global
+
     ; "Armor (2)" "Armor" => 2
     int categoriesAndCounts = JMap.object()
     JValue.retain(categoriesAndCounts)
@@ -36,7 +37,15 @@ function ShowSearchResultsCategoryList(int searchResults) global
         i += 1
     endWhile
 
+    string[] categoryListActionNames = Search_UI_Actions.GetCategoryListActionNames(JMap.allKeysPArray(categoriesAndCounts))
+
     UIListMenu listMenu = UIExtensions.GetMenu("UIListMenu") as UIListMenu
+
+    i = 0
+    while i < categoryListActionNames.Length
+        listMenu.AddEntryItem(categoryListActionNames[i])
+        i += 1
+    endWhile
 
     int allCategoryNames = JArray.object()
     JValue.retain(allCategoryNames)
@@ -54,9 +63,24 @@ function ShowSearchResultsCategoryList(int searchResults) global
     listMenu.OpenMenu()
 
     int selection = listMenu.GetResultInt()
-    string selectedCategoryName = JArray.getStr(allCategoryNames, selection)
+    int resultOffset = categoryListActionNames.Length
 
-    ShowSearchResultsCategory(searchResults, selectedCategoryName)
+    if selection > -1
+        if selection < resultOffset
+            int selectedAction = Search_UI_Actions.GetCategoryListAction(categoryListActionNames[selection])
+            string eventName = JMap.getStr(selectedAction, "action")
+            int theEvent = ModEvent.Create("Search_Action_" + eventName)
+            ModEvent.PushString(theEvent, eventName)
+            ModEvent.PushInt(theEvent, searchResults)
+            ModEvent.PushString(theEvent, "")
+            ModEvent.PushInt(theEvent, 0)
+            ModEvent.PushInt(theEvent, 0)
+            ModEvent.Send(theEvent)
+        else
+            string selectedCategoryName = JArray.getStr(allCategoryNames, selection - resultOffset)
+            ShowSearchResultsCategory(searchResults, selectedCategoryName)
+        endIf
+    endIf
 
     JValue.release(allCategoryNames)
     JValue.release(categoriesAndCounts)
