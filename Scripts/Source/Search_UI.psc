@@ -16,7 +16,6 @@ function ShowSearchPrompt() global
 endFunction
 
 function ShowSearchResultsCategoryList(int searchResults) global
-
     ; "Armor (2)" "Armor" => 2
     int categoriesAndCounts = JMap.object()
     JValue.retain(categoriesAndCounts)
@@ -68,14 +67,7 @@ function ShowSearchResultsCategoryList(int searchResults) global
     if selection > -1
         if selection < resultOffset
             int selectedAction = Search_UI_Actions.GetCategoryListAction(categoryListActionNames[selection])
-            string eventName = JMap.getStr(selectedAction, "action")
-            int theEvent = ModEvent.Create("Search_Action_" + eventName)
-            ModEvent.PushString(theEvent, eventName)
-            ModEvent.PushInt(theEvent, searchResults)
-            ModEvent.PushString(theEvent, "")
-            ModEvent.PushInt(theEvent, 0)
-            ModEvent.PushInt(theEvent, 0)
-            ModEvent.Send(theEvent)
+            Search_UI_Actions.SendActionEvent(selectedAction, searchResults)
         else
             string selectedCategoryName = JArray.getStr(allCategoryNames, selection - resultOffset)
             ShowSearchResultsCategory(searchResults, selectedCategoryName)
@@ -124,14 +116,7 @@ function ShowSearchResultsCategory(int searchResults, string categoryName) globa
     if selection > -1
         if selection < resultOffset
             int selectedAction = Search_UI_Actions.GetCategoryAction(categoryName, categoryActionNames[selection])
-            string eventName = JMap.getStr(selectedAction, "action")
-            int theEvent = ModEvent.Create("Search_Action_" + eventName)
-            ModEvent.PushString(theEvent, eventName)
-            ModEvent.PushInt(theEvent, searchResults)
-            ModEvent.PushString(theEvent, categoryName)
-            ModEvent.PushInt(theEvent, 0)
-            ModEvent.PushInt(theEvent, 0)
-            ModEvent.Send(theEvent)
+            Search_UI_Actions.SendActionEvent(selectedAction, searchResults, categoryName)
         else
             int index = selection - resultOffset
             int searchResultSet = JArray.getObj(resultSetsForEachResult, index)
@@ -152,14 +137,7 @@ function ShowSearchResult(int searchResults, string categoryName, int searchResu
         return
     elseIf categoryResultActionNames.Length == 1
         int selectedAction = Search_UI_Actions.GetCategoryResultAction(categoryName, categoryResultActionNames[0])
-        string eventName = JMap.getStr(selectedAction, "action")
-        int theEvent = ModEvent.Create("Search_Action_" + eventName)
-        ModEvent.PushString(theEvent, eventName)
-        ModEvent.PushInt(theEvent, searchResults)
-        ModEvent.PushString(theEvent, categoryName)
-        ModEvent.PushInt(theEvent, searchResultSet)
-        ModEvent.PushInt(theEvent, searchResult)
-        ModEvent.Send(theEvent)
+        Search_UI_Actions.SendActionEvent(selectedAction, searchResults, categoryName, searchResultSet, searchResult)
         return
     endIf
 
@@ -176,13 +154,5 @@ function ShowSearchResult(int searchResults, string categoryName, int searchResu
     int selection = listMenu.GetResultInt()
     string selectedActionName = categoryResultActionNames[selection]
     int selectedAction = Search_UI_Actions.GetCategoryResultAction(categoryName, selectedActionName)
-
-    string eventName = JMap.getStr(selectedAction, "action")
-    int theEvent = ModEvent.Create("Search_Action_" + eventName)
-    ModEvent.PushString(theEvent, eventName)
-    ModEvent.PushInt(theEvent, searchResults)
-    ModEvent.PushString(theEvent, categoryName)
-    ModEvent.PushInt(theEvent, searchResultSet)
-    ModEvent.PushInt(theEvent, searchResult)
-    ModEvent.Send(theEvent)
+    Search_UI_Actions.SendActionEvent(selectedAction, searchResults, categoryName, searchResultSet, searchResult)
 endFunction

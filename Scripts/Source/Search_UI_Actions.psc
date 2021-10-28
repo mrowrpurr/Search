@@ -1,6 +1,22 @@
 scriptName Search_UI_Actions
 {Integrates Search Actions with the UI via configuration files}
 
+function SendActionEvent(int actionConfig, int searchResults, string categoryName = "", int searchResultSet = 0, int searchResult = 0) global
+    string actionName = JMap.getStr(actionConfig, "action")
+
+    int actionEvent = JMap.object()
+    JMap.setObj(actionEvent, "action", actionConfig)
+    JMap.setStr(actionEvent, "actionName", actionName)
+    JMap.setObj(actionEvent, "searchResult", searchResult)
+    JMap.setObj(actionEvent, "searchResults", searchResults)
+    JMap.setObj(actionEvent, "searchResultSet", searchResultSet)
+    JMap.setStr(actionEvent, "categoryName", categoryName)
+
+    int theEvent = ModEvent.Create("Search_Action_" + actionName)
+    ModEvent.PushInt(theEvent, actionEvent)
+    ModEvent.Send(theEvent)
+endFunction
+
 string[] function GetCategoryListActionNames(string[] categoryNames) global
     int actionNames = JArray.object()
     int categoryActionConfigs = JValue.readFromDirectory("Data/Search/CategoryActions/")
