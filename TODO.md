@@ -1,0 +1,121 @@
+ - [ ] Action
+ - [ ] Actor Reference
+ - [ ] Activator
+ - [ ] Addon Node
+ - [ ] Potion
+ - [ ] Ammo
+ - [ ] Animation Object
+ - [ ] Apparatus (probably unused)
+ - [ ] Armor Addon (Model)
+ - [ ] Armor
+ - [ ] Art Object
+ - [ ] Acoustic Space
+ - [ ] Association Type
+ - [ ] Actor Values/Perk Tree Graphics
+ - [ ] Book
+ - [ ] Body Part Data
+ - [ ] Camera Shot
+ - [ ] Cell
+ - [ ] Class
+ - [ ] Color
+ - [ ] Climate
+ - [ ] Constructible Object (recipes)
+ - [ ] Collision Layer
+ - [ ] Container
+ - [ ] Camera Path
+ - [ ] Combat Style
+ - [ ] Debris
+ - [ ] Dialog Topic
+ - [ ] Dialog Branch
+ - [ ] Dialog View
+ - [ ] Default Object Manager
+ - [ ] Door
+ - [ ] Dual Cast Data (possibly unused)
+ - [ ] Encounter Zone
+ - [ ] Effect Shader
+ - [ ] Enchantment
+ - [ ] Equip Slot (flag-type values)
+ - [ ] Explosion
+ - [ ] Eyes
+ - [ ] Faction
+ - [ ] Flora
+ - [ ] Form List (non-leveled list)
+ - [ ] Footstep
+ - [ ] Footstep Set
+ - [ ] Furniture
+ - [ ] Global Variable
+ - [ ] Game Setting
+ - [ ] Grass
+ - [ ] Form Group
+ - [ ] Hazard
+ - [ ] Head Part
+ - [ ] Idle Animation
+ - [ ] Idle Marker
+ - [ ] Image Space Modifier
+ - [ ] Image Space
+ - [ ] Dialog Topic Info
+ - [ ] Ingredient
+ - [ ] Impact Data
+ - [ ] Impact Data Set
+ - [ ] Key
+ - [ ] Keyword
+ - [ ] Landscape
+ - [ ] Location Reference Type
+ - [ ] Location
+ - [ ] Lighting Template
+ - [ ] Light
+ - [ ] Load Screen
+ - [ ] Land Texture
+ - [ ] Leveled Item
+ - [ ] Leveled Actor
+ - [ ] Leveled Spell
+ - [ ] Material Object
+ - [ ] Material Type
+ - [ ] Message
+ - [ ] Magic Effect
+ - [ ] Misc. Object
+ - [ ] Movement Type
+ - [ ] Movable Static
+ - [ ] Music Type
+ - [ ] Music Track
+ - [ ] Navigation (master data)
+ - [ ] NavMesh
+ - [ ] Note
+ - [ ] Actor
+ - [ ] Outfit
+ - [ ] AI Package
+ - [ ] Perk
+ - [ ] Placed grenade
+ - [ ] Placed hazard
+ - [ ] Projectile
+ - [ ] Quest
+ - [ ] Race / Creature type
+ - [ ] Object Reference
+ - [ ] Region (Audio/Weather)
+ - [ ] Relationship
+ - [ ] Reverb Parameters
+ - [ ] Visual Effect
+ - [ ] Scene
+ - [ ] Scroll
+ - [ ] Shout
+ - [ ] Soul Gem
+ - [ ] Story Manager Branch Node
+ - [ ] Story Manager Event Node
+ - [ ] Story Manager Quest Node
+ - [ ] Sound Category
+ - [ ] Sound Reference
+ - [ ] Sound Output Model
+ - [ ] Sound
+ - [ ] Spell
+ - [ ] Shader Particle Geometry
+ - [ ] Static
+ - [ ] Talking Activator
+ - [ ] Plugin info / Header
+ - [ ] Tree
+ - [ ] Texture Set
+ - [ ] Voice Type
+ - [ ] Water Type
+ - [ ] Weapon
+ - [ ] Word Of Power
+ - [ ] Worldspace
+ - [ ] Weather

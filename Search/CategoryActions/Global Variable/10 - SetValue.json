@@ -1,0 +1,5 @@
+{
+    "text": "[Set Value]",
+    "action": "SetGlobalValue",
+    "onfinish": "showitem"
+}
