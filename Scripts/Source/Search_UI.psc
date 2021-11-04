@@ -2,9 +2,10 @@ scriptName Search_UI
 {Version two of Search UI ~ the Extensible version!}
 
 function ShowSearchPrompt() global
-    string[] searchProviders = new string[2]
+    string[] searchProviders = new string[3]
     searchProviders[0] = "ConsoleSearch"
     searchProviders[1] = "Weather"
+    searchProviders[2] = "Spell"
 
     string query = UIExtensionsExtensions.GetUserText()
     int results = Search.ExecuteQuery(query, searchProviders)
